@@ -1,0 +1,3108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendor Evaluation Matrix Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-50: #EFF6FF;
+    --blue-100: #DBEAFE;
+    --blue-200: #BFDBFE;
+    --blue-300: #93C5FD;
+    --blue-400: #60A5FA;
+    --blue-500: #3B82F6;
+    --blue-600: #2563EB;
+    --blue-700: #1D4ED8;
+    --blue-800: #1E40AF;
+    --blue-900: #1E3A8A;
+    --slate-50: #F8FAFC;
+    --slate-100: #F1F5F9;
+    --slate-200: #E2E8F0;
+    --slate-300: #CBD5E1;
+    --slate-500: #64748B;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1E293B;
+    --slate-900: #0F172A;
+    --green-400: #4ADE80;
+    --green-500: #22C55E;
+    --green-600: #16A34A;
+    --green-100: #DCFCE7;
+    --amber-100: #FEF3C7;
+    --amber-500: #F59E0B;
+    --amber-600: #D97706;
+    --red-100: #FEE2E2;
+    --red-500: #EF4444;
+    --red-600: #DC2626;
+    --purple-100: #F3E8FF;
+    --purple-500: #A855F7;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(37,99,235,0.08), 0 2px 6px rgba(0,0,0,0.04);
+    --shadow-lg: 0 10px 40px rgba(37,99,235,0.12), 0 4px 12px rgba(0,0,0,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #EFF6FF 0%, #F8FAFC 50%, #EFF6FF 100%);
+    min-height: 100vh;
+    color: var(--slate-700);
+    font-size: 14px;
+  }
+
+  /* HEADER */
+  .header {
+    background: white;
+    border-bottom: 1px solid var(--blue-100);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .header-logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--blue-600), var(--blue-400));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 18px; font-weight: 700;
+  }
+  .header-title { font-size: 16px; font-weight: 600; color: var(--slate-800); }
+  .header-sub { font-size: 12px; color: var(--slate-500); margin-top: 1px; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .btn {
+    padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: none; font-family: inherit; transition: all 0.2s;
+  }
+  .btn-outline {
+    background: white; border: 1px solid var(--blue-200); color: var(--blue-600);
+  }
+  .btn-outline:hover { background: var(--blue-50); border-color: var(--blue-300); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+    color: white; box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+  }
+  .btn-primary:hover { background: linear-gradient(135deg, var(--blue-700), var(--blue-600)); transform: translateY(-1px); }
+
+  /* TABS */
+  .tabs-bar {
+    background: white;
+    border-bottom: 1px solid var(--slate-200);
+    padding: 0 32px;
+    display: flex; gap: 4px;
+  }
+  .tab {
+    padding: 14px 18px; font-size: 13px; font-weight: 500; cursor: pointer;
+    border-bottom: 2px solid transparent; color: var(--slate-500);
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .tab:hover { color: var(--blue-600); }
+  .tab.active { color: var(--blue-600); border-bottom-color: var(--blue-600); }
+
+  /* MAIN */
+  .main { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+
+  /* PAGE */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* PROJECT HEADER CARD */
+  .project-card {
+    background: linear-gradient(135deg, var(--blue-700) 0%, var(--blue-500) 100%);
+    border-radius: 16px;
+    padding: 28px 32px;
+    color: white;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .project-card::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .project-card::after {
+    content: '';
+    position: absolute; bottom: -60px; right: 120px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .project-meta { display: flex; gap: 32px; margin-top: 20px; flex-wrap: wrap; }
+  .project-meta-item label { font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px; }
+  .project-meta-item input, .project-meta-item select {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: white; border-radius: 8px; padding: 7px 12px;
+    font-family: inherit; font-size: 13px; min-width: 160px;
+  }
+  .project-meta-item input::placeholder { color: rgba(255,255,255,0.5); }
+  .project-meta-item input:focus, .project-meta-item select:focus {
+    outline: none; background: rgba(255,255,255,0.22);
+  }
+  .project-meta-item select option { color: var(--slate-700); background: white; }
+  .project-meta-item span {
+    font-size: 14px; font-weight: 500;
+  }
+  .project-title-row { display: flex; align-items: center; gap: 16px; }
+  .project-title-row h2 { font-size: 22px; font-weight: 700; }
+  .badge {
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .badge-active { background: rgba(255,255,255,0.2); color: white; }
+
+  /* SUMMARY STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: white; border-radius: 12px; padding: 20px;
+    box-shadow: var(--shadow-sm); border: 1px solid var(--blue-100);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; margin-bottom: 12px; }
+  .stat-icon-blue { background: var(--blue-100); }
+  .stat-icon-green { background: var(--green-100); }
+  .stat-icon-amber { background: var(--amber-100); }
+  .stat-icon-purple { background: var(--purple-100); }
+  .stat-value { font-size: 26px; font-weight: 700; color: var(--slate-800); }
+  .stat-label { font-size: 12px; color: var(--slate-500); margin-top: 4px; }
+
+  /* SECTION CARD */
+  .card {
+    background: white; border-radius: 12px; border: 1px solid var(--blue-100);
+    box-shadow: var(--shadow-sm); margin-bottom: 20px; overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--slate-100);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-header h3 { font-size: 14px; font-weight: 600; color: var(--slate-800); display: flex; align-items: center; gap: 8px; }
+  .card-body { padding: 20px; }
+
+  /* VENDORS GRID */
+  .vendors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .vendor-card {
+    border: 1.5px solid var(--blue-100); border-radius: 10px; padding: 16px;
+    cursor: pointer; transition: all 0.2s; position: relative;
+  }
+  .vendor-card:hover { border-color: var(--blue-300); box-shadow: 0 4px 12px rgba(37,99,235,0.1); }
+  .vendor-card.top { border-color: var(--blue-500); background: var(--blue-50); }
+  .vendor-rank {
+    position: absolute; top: 12px; right: 12px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--blue-600); color: white;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .vendor-rank.rank-1 { background: linear-gradient(135deg, #F59E0B, #FBBF24); }
+  .vendor-rank.rank-2 { background: var(--slate-400); }
+  .vendor-rank.rank-3 { background: #B45309; }
+  .vendor-name-input {
+    width: 100%; border: none; outline: none; font-family: inherit;
+    font-size: 14px; font-weight: 600; color: var(--slate-800);
+    background: transparent; padding: 0; margin-bottom: 12px;
+  }
+  .vendor-score-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .vendor-score-label { font-size: 11px; color: var(--slate-500); }
+  .vendor-score-val { font-size: 13px; font-weight: 600; color: var(--blue-700); font-family: 'DM Mono', monospace; }
+  .mini-bar { height: 4px; background: var(--slate-100); border-radius: 2px; overflow: hidden; margin-top: 2px; }
+  .mini-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--blue-400), var(--blue-600)); transition: width 0.5s ease; }
+  .add-vendor-btn {
+    border: 1.5px dashed var(--blue-200); border-radius: 10px; padding: 16px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--blue-400); font-size: 13px; gap: 8px;
+    transition: all 0.2s;
+  }
+  .add-vendor-btn:hover { border-color: var(--blue-400); color: var(--blue-600); background: var(--blue-50); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    background: var(--blue-50); color: var(--blue-800); font-weight: 600;
+    padding: 11px 14px; text-align: left; font-size: 12px;
+    border-bottom: 1px solid var(--blue-200); white-space: nowrap;
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--slate-100); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--blue-50); }
+  .section-row td { background: var(--blue-50); font-weight: 600; color: var(--blue-800); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .section-row:hover td { background: var(--blue-100); }
+
+  /* SCORE INPUT */
+  .score-input {
+    width: 56px; border: 1px solid var(--blue-200); border-radius: 6px;
+    padding: 5px 8px; font-family: 'DM Mono', monospace; font-size: 13px;
+    color: var(--slate-800); text-align: center; background: white;
+    transition: border-color 0.15s;
+  }
+  .score-input:focus { outline: none; border-color: var(--blue-400); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+  .score-input.warn { border-color: var(--amber-500); background: var(--amber-100); }
+  .weight-input {
+    width: 62px; border: 1px solid var(--blue-200); border-radius: 6px;
+    padding: 5px 8px; font-family: 'DM Mono', monospace; font-size: 13px;
+    text-align: center; background: white;
+  }
+  .weight-input:focus { outline: none; border-color: var(--blue-400); }
+  .cost-input {
+    width: 110px; border: 1px solid var(--blue-200); border-radius: 6px;
+    padding: 5px 8px; font-family: 'DM Mono', monospace; font-size: 13px;
+    background: white;
+  }
+  .cost-input:focus { outline: none; border-color: var(--blue-400); }
+
+  /* SCORE PILL */
+  .score-pill {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600; font-family: 'DM Mono', monospace;
+  }
+  .score-ex { background: var(--green-100); color: var(--green-600); }
+  .score-good { background: var(--blue-100); color: var(--blue-700); }
+  .score-acc { background: var(--amber-100); color: var(--amber-600); }
+  .score-poor { background: var(--red-100); color: var(--red-600); }
+
+  /* RADAR CHART */
+  .chart-container { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+  .radar-wrap { flex: 1; min-width: 300px; }
+
+  /* LEGEND */
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--slate-600); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* RANKING TABLE */
+  .rank-table-wrap { flex: 1; min-width: 260px; }
+  .rank-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 0; border-bottom: 1px solid var(--slate-100);
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .rank-1-bg { background: #FEF3C7; color: #B45309; }
+  .rank-2-bg { background: var(--slate-100); color: var(--slate-600); }
+  .rank-3-bg { background: #FEF3C7; color: #92400E; }
+  .rank-other { background: var(--blue-100); color: var(--blue-700); }
+  .rank-name { flex: 1; font-size: 13px; font-weight: 500; color: var(--slate-800); }
+  .rank-bar-wrap { width: 100px; }
+  .rank-bar { height: 6px; background: var(--slate-100); border-radius: 3px; overflow: hidden; }
+  .rank-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--blue-400), var(--blue-600)); transition: width 0.6s ease; }
+  .rank-score { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 600; color: var(--blue-700); width: 46px; text-align: right; }
+
+  /* WEIGHTING SLIDER */
+  .weighting-row { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--slate-100); }
+  .weighting-row:last-child { border-bottom: none; }
+  .weighting-label { flex: 1; font-size: 13px; color: var(--slate-700); }
+  .weighting-slider { flex: 2; }
+  input[type=range] { width: 100%; accent-color: var(--blue-500); }
+  .weighting-pct { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 600; color: var(--blue-700); width: 42px; text-align: right; }
+  .total-indicator { padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; }
+  .total-ok { background: var(--green-100); color: var(--green-600); }
+  .total-warn { background: var(--red-100); color: var(--red-600); }
+
+  /* SCORING GUIDE */
+  .score-guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .score-guide-item { padding: 12px; border-radius: 8px; border: 1px solid; }
+  .sg-0 { border-color: var(--red-500); background: var(--red-100); }
+  .sg-1 { border-color: var(--amber-500); background: var(--amber-100); }
+  .sg-2 { border-color: var(--blue-300); background: var(--blue-50); }
+  .sg-3 { border-color: var(--blue-500); background: var(--blue-100); }
+  .sg-4 { border-color: var(--green-500); background: var(--green-100); }
+  .sg-score { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .sg-0 .sg-score { color: var(--red-600); }
+  .sg-1 .sg-score { color: var(--amber-600); }
+  .sg-2 .sg-score { color: var(--blue-600); }
+  .sg-3 .sg-score { color: var(--blue-700); }
+  .sg-4 .sg-score { color: var(--green-600); }
+  .sg-label { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .sg-desc { font-size: 11px; color: var(--slate-600); line-height: 1.4; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px;
+    background: var(--slate-800); color: white; padding: 12px 20px;
+    border-radius: 10px; font-size: 13px; font-weight: 500;
+    box-shadow: var(--shadow-lg); z-index: 9999;
+    transform: translateY(80px); opacity: 0; transition: all 0.3s;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* PRINT */
+  @media print {
+    .header, .tabs-bar, .btn, .add-vendor-btn { display: none; }
+    .main { padding: 16px; }
+  }
+
+  /* ===== QCDSME ===== */
+  .qcdsme-hero {
+    background: linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 50%, #3B82F6 100%);
+    border-radius: 16px; padding: 28px 32px; color: white;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; gap: 20px; flex-wrap: wrap;
+  }
+  .qcdsme-hero h2 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+  .qcdsme-hero p { font-size: 13px; opacity: 0.85; max-width: 520px; line-height: 1.5; }
+  .qcdsme-hero-badges { display: flex; gap: 10px; flex-shrink: 0; }
+  .qb {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900; color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .qb.Q { background: #2563EB; }
+  .qb.C { background: #16A34A; }
+  .qb.D { background: #D97706; }
+  .qb.S { background: #DC2626; }
+  .qb.M { background: #7C3AED; }
+  .qb.E { background: #0891B2; }
+
+  .qcdsme-dim-card {
+    padding: 16px; border-radius: 10px; border: 1px solid;
+    transition: transform 0.2s;
+  }
+  .qcdsme-dim-card:hover { transform: translateY(-2px); }
+  .dim-Q { border-color: #BFDBFE; background: #EFF6FF; }
+  .dim-C { border-color: #BBF7D0; background: #F0FDF4; }
+  .dim-D { border-color: #FDE68A; background: #FFFBEB; }
+  .dim-S { border-color: #FECACA; background: #FEF2F2; }
+  .dim-M { border-color: #DDD6FE; background: #F5F3FF; }
+  .dim-E { border-color: #A5F3FC; background: #ECFEFF; }
+  .dim-letter {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 900; color: white; margin-bottom: 10px;
+  }
+  .dim-title { font-size: 13px; font-weight: 700; color: var(--slate-800); margin-bottom: 4px; }
+  .dim-subtitle { font-size: 11px; color: var(--slate-500); margin-bottom: 10px; }
+  .dim-criteria li { font-size: 11px; color: var(--slate-600); margin-bottom: 4px; padding-left: 4px; list-style: disc inside; }
+
+  /* QCDSME score cell */
+  .qscore-input {
+    width: 52px; border: 1.5px solid var(--blue-200); border-radius: 6px;
+    padding: 5px; font-family: 'DM Mono', monospace; font-size: 13px;
+    text-align: center; background: white; transition: border-color 0.15s;
+  }
+  .qscore-input:focus { outline: none; border-color: var(--blue-500); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+
+  /* ===== GOVERNANCE / APPROVAL ===== */
+  .gov-banner {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 60%, #1D4ED8 100%);
+    border-radius: 16px; padding: 28px 32px; color: white;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; gap: 24px; flex-wrap: wrap;
+  }
+  .gov-stat {
+    text-align: center; background: rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 12px 18px; min-width: 70px;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .gov-stat-val { font-size: 26px; font-weight: 800; font-family: 'DM Mono', monospace; }
+  .gov-stat-lbl { font-size: 10px; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+
+  /* Stage gate */
+  .stage-gate-row {
+    display: flex; align-items: center; overflow-x: auto;
+    padding-bottom: 8px; gap: 0;
+  }
+  .stage-gate {
+    flex-shrink: 0; text-align: center; position: relative;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .stage-gate-box {
+    width: 110px; padding: 10px 8px; border-radius: 10px;
+    border: 2px solid var(--slate-200); background: white;
+    font-size: 11px; font-weight: 600; color: var(--slate-600);
+    cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .stage-gate-box:hover { border-color: var(--blue-400); color: var(--blue-700); box-shadow: 0 4px 12px rgba(37,99,235,0.12); }
+  .stage-gate-box.active { border-color: var(--blue-500); background: var(--blue-50); color: var(--blue-700); }
+  .stage-gate-box.done { border-color: var(--green-500); background: var(--green-100); color: var(--green-700); }
+  .stage-gate-box.blocked { border-color: var(--red-500); background: var(--red-100); color: var(--red-700); }
+  .stage-gate-icon { font-size: 18px; margin-bottom: 4px; }
+  .stage-gate-count { font-size: 18px; font-weight: 800; font-family: 'DM Mono', monospace; margin-top: 4px; }
+  .stage-arrow {
+    width: 28px; height: 2px; background: var(--slate-200);
+    flex-shrink: 0; position: relative;
+  }
+  .stage-arrow::after {
+    content: ''; position: absolute; right: -1px; top: -4px;
+    border-left: 7px solid var(--slate-300); border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+  }
+
+  /* Approval pipeline table */
+  .apl-status {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700;
+  }
+  .apl-pending { background: #FEF3C7; color: #B45309; }
+  .apl-approved { background: var(--green-100); color: var(--green-600); }
+  .apl-rejected { background: var(--red-100); color: var(--red-600); }
+  .apl-conditional { background: var(--purple-100); color: #6D28D9; }
+  .apl-review { background: var(--blue-100); color: var(--blue-700); }
+  .priority-chip {
+    display: inline-block; padding: 2px 7px; border-radius: 10px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+  }
+  .pri-normal { background: var(--slate-100); color: var(--slate-600); }
+  .pri-urgent { background: #FEF3C7; color: #B45309; }
+  .pri-critical { background: var(--red-100); color: var(--red-600); }
+
+  /* DOA Table */
+  .doa-intro { font-size: 12px; color: var(--slate-500); margin-bottom: 14px; padding: 10px; background: var(--blue-50); border-radius: 8px; border-left: 3px solid var(--blue-400); }
+  .doa-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .doa-table th { background: var(--slate-800); color: white; padding: 8px 10px; font-weight: 600; font-size: 11px; }
+  .doa-table td { padding: 8px 10px; border-bottom: 1px solid var(--slate-100); }
+  .doa-table tr:hover td { background: var(--blue-50); }
+  .risk-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; }
+  .risk-chip.low { background: var(--green-100); color: var(--green-600); }
+  .risk-chip.med { background: var(--amber-100); color: var(--amber-600); }
+  .risk-chip.high { background: var(--red-100); color: var(--red-600); }
+
+  /* Pre-award checklist */
+  .pac-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--slate-100); cursor: pointer;
+  }
+  .pac-item:last-child { border-bottom: none; }
+  .pac-check {
+    width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--slate-300);
+    flex-shrink: 0; margin-top: 1px; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; font-size: 10px;
+  }
+  .pac-check.checked { background: var(--green-500); border-color: var(--green-500); color: white; }
+  .pac-text { font-size: 12px; color: var(--slate-700); flex: 1; }
+  .pac-category { font-size: 10px; color: var(--slate-400); margin-top: 1px; }
+
+  /* COI Register */
+  .coi-row { padding: 10px 0; border-bottom: 1px solid var(--slate-100); }
+  .coi-row:last-child { border-bottom: none; }
+  .coi-name { font-size: 13px; font-weight: 600; color: var(--slate-800); }
+  .coi-detail { font-size: 11px; color: var(--slate-500); margin-top: 2px; }
+
+  /* Audit trail */
+  .audit-entry {
+    padding: 10px 16px; border-bottom: 1px solid var(--slate-100);
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .audit-entry:last-child { border-bottom: none; }
+  .audit-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+  }
+  .audit-approved-dot { background: var(--green-500); }
+  .audit-submitted-dot { background: var(--blue-500); }
+  .audit-rejected-dot { background: var(--red-500); }
+  .audit-system-dot { background: var(--slate-400); }
+  .audit-conditional-dot { background: #8B5CF6; }
+  .audit-action { font-size: 12px; font-weight: 600; color: var(--slate-800); }
+  .audit-meta { font-size: 11px; color: var(--slate-400); margin-top: 1px; }
+
+  /* KPI panel */
+  .kpi-row { padding: 10px 0; border-bottom: 1px solid var(--slate-100); }
+  .kpi-row:last-child { border-bottom: none; }
+  .kpi-label { font-size: 12px; color: var(--slate-600); margin-bottom: 5px; display: flex; justify-content: space-between; }
+  .kpi-bar { height: 6px; background: var(--slate-100); border-radius: 3px; overflow: hidden; }
+  .kpi-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+  /* Decision panel */
+  .decision-vendor-row {
+    border: 1px solid var(--slate-200); border-radius: 10px;
+    margin-bottom: 12px; overflow: hidden;
+  }
+  .decision-vendor-header {
+    background: var(--slate-50); padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .decision-votes { padding: 12px 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .vote-btn {
+    padding: 7px 16px; border-radius: 8px; border: 1.5px solid;
+    font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+    transition: all 0.15s;
+  }
+  .vote-approve { border-color: var(--green-500); color: var(--green-600); background: white; }
+  .vote-approve:hover, .vote-approve.active { background: var(--green-100); }
+  .vote-reject { border-color: var(--red-500); color: var(--red-600); background: white; }
+  .vote-reject:hover, .vote-reject.active { background: var(--red-100); }
+  .vote-conditional { border-color: #8B5CF6; color: #6D28D9; background: white; }
+  .vote-conditional:hover, .vote-conditional.active { background: var(--purple-100); }
+  .vote-abstain { border-color: var(--slate-300); color: var(--slate-500); background: white; }
+  .vote-abstain:hover, .vote-abstain.active { background: var(--slate-100); }
+  .vote-tally { font-size: 11px; color: var(--slate-500); margin-left: auto; align-self: center; }
+
+  /* ======= MULTI-STEP WIZARD MODAL ======= */
+  .wizard-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(15,23,42,0.55); z-index: 600;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(3px);
+    padding: 16px;
+  }
+  .wizard-overlay.open { display: flex; }
+  .wizard-modal {
+    background: white; border-radius: 20px;
+    width: 100%; max-width: 680px;
+    max-height: 90vh; display: flex; flex-direction: column;
+    box-shadow: 0 24px 64px rgba(15,23,42,0.18), 0 8px 24px rgba(37,99,235,0.12);
+    overflow: hidden;
+  }
+
+  /* Wizard header */
+  .wiz-header {
+    padding: 24px 28px 0;
+    border-bottom: 1px solid var(--slate-100);
+    background: white;
+  }
+  .wiz-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .wiz-title { font-size: 18px; font-weight: 700; color: var(--slate-800); }
+  .wiz-close {
+    width: 32px; height: 32px; border-radius: 8px; border: none;
+    background: var(--slate-100); color: var(--slate-500); cursor: pointer;
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .wiz-close:hover { background: var(--red-100); color: var(--red-600); }
+
+  /* Step progress */
+  .wiz-steps { display: flex; gap: 0; margin-bottom: -1px; }
+  .wiz-step-tab {
+    flex: 1; padding: 10px 4px; text-align: center; font-size: 11px;
+    font-weight: 600; color: var(--slate-400); border-bottom: 2px solid transparent;
+    cursor: default; transition: all 0.2s; position: relative; user-select: none;
+  }
+  .wiz-step-tab.done { color: var(--green-600); border-bottom-color: var(--green-500); }
+  .wiz-step-tab.active { color: var(--blue-600); border-bottom-color: var(--blue-600); }
+  .wiz-step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%;
+    font-size: 10px; font-weight: 700; margin-right: 5px;
+    background: var(--slate-200); color: var(--slate-500);
+    transition: all 0.2s;
+  }
+  .wiz-step-tab.active .wiz-step-num { background: var(--blue-600); color: white; }
+  .wiz-step-tab.done .wiz-step-num { background: var(--green-500); color: white; }
+
+  /* Step progress bar */
+  .wiz-progress-bar {
+    height: 3px; background: var(--slate-100);
+    margin: 0 28px; border-radius: 2px; overflow: hidden;
+  }
+  .wiz-progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--blue-500), var(--blue-400));
+    border-radius: 2px; transition: width 0.4s ease;
+  }
+
+  /* Body */
+  .wiz-body { overflow-y: auto; padding: 24px 28px; flex: 1; }
+  .wiz-page { display: none; }
+  .wiz-page.active { display: block; }
+  .wiz-section-title {
+    font-size: 13px; font-weight: 700; color: var(--blue-700);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--blue-100);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Form fields */
+  .wiz-grid { display: grid; gap: 14px; }
+  .wiz-grid-2 { grid-template-columns: 1fr 1fr; }
+  .wiz-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .wf-group { display: flex; flex-direction: column; gap: 5px; }
+  .wf-group.span2 { grid-column: span 2; }
+  .wf-group.span3 { grid-column: span 3; }
+  .wf-label {
+    font-size: 11px; font-weight: 700; color: var(--slate-600);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .wf-label .required { color: var(--red-500); }
+  .wf-label .hint { font-weight: 400; text-transform: none; font-size: 10px; color: var(--slate-400); letter-spacing: 0; }
+  .wf-input, .wf-select, .wf-textarea {
+    border: 1.5px solid var(--slate-200); border-radius: 8px;
+    padding: 9px 12px; font-family: inherit; font-size: 13px;
+    color: var(--slate-800); background: white; width: 100%;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .wf-input:focus, .wf-select:focus, .wf-textarea:focus {
+    outline: none; border-color: var(--blue-400);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+  }
+  .wf-input.error { border-color: var(--red-500); background: #FFF5F5; }
+  .wf-textarea { resize: vertical; min-height: 70px; }
+  .wf-select option { color: var(--slate-700); }
+
+  /* Checkbox group */
+  .wf-checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .wf-checkbox-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border: 1.5px solid var(--slate-200);
+    border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 500;
+    color: var(--slate-600); transition: all 0.15s; user-select: none;
+  }
+  .wf-checkbox-item:hover { border-color: var(--blue-300); color: var(--blue-600); }
+  .wf-checkbox-item.checked { border-color: var(--blue-500); background: var(--blue-50); color: var(--blue-700); }
+  .wf-checkbox-item input { display: none; }
+
+  /* Rating stars */
+  .wf-star-row { display: flex; gap: 6px; align-items: center; }
+  .wf-star {
+    font-size: 20px; cursor: pointer; color: var(--slate-300);
+    transition: color 0.1s; line-height: 1;
+  }
+  .wf-star.lit { color: #F59E0B; }
+
+  /* Risk badge */
+  .risk-options { display: flex; gap: 8px; }
+  .risk-opt {
+    flex: 1; padding: 8px; border-radius: 8px; border: 1.5px solid var(--slate-200);
+    cursor: pointer; text-align: center; font-size: 12px; font-weight: 600;
+    transition: all 0.15s;
+  }
+  .risk-opt.low { border-color: var(--green-500); color: var(--green-600); }
+  .risk-opt.medium { border-color: var(--amber-500); color: var(--amber-600); }
+  .risk-opt.high { border-color: var(--red-500); color: var(--red-600); }
+  .risk-opt.selected.low { background: var(--green-100); }
+  .risk-opt.selected.medium { background: var(--amber-100); }
+  .risk-opt.selected.high { background: var(--red-100); }
+
+  /* Info callout */
+  .wiz-callout {
+    background: var(--blue-50); border: 1px solid var(--blue-200);
+    border-radius: 8px; padding: 10px 14px; font-size: 12px;
+    color: var(--blue-700); margin-bottom: 16px; display: flex; gap: 8px; align-items: flex-start;
+  }
+
+  /* Wizard footer */
+  .wiz-footer {
+    padding: 16px 28px; border-top: 1px solid var(--slate-100);
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--slate-50);
+  }
+  .wiz-footer-left { font-size: 12px; color: var(--slate-400); }
+  .wiz-footer-right { display: flex; gap: 10px; }
+
+  /* Vendor profile card in settings */
+  .vendor-detail-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;
+    background: var(--blue-100); color: var(--blue-700); margin: 2px;
+  }
+
+  /* THRESHOLD BADGE */
+  .threshold-badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .threshold-pass { background: var(--green-100); color: var(--green-600); }
+  .threshold-fail { background: var(--red-100); color: var(--red-600); }
+
+  svg text { font-family: 'DM Sans', sans-serif; }
+
+  .section-weight-label {
+    display: inline-block; padding: 2px 8px; border-radius: 12px;
+    font-size: 11px; font-weight: 600; background: var(--blue-100); color: var(--blue-700);
+    margin-left: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">V</div>
+    <div>
+      <div class="header-title">Vendor Evaluation Matrix</div>
+      <div class="header-sub">MEAT Framework · Quality-Price Assessment</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-outline" onclick="printDashboard()">⬇ Export</button>
+    <button class="btn btn-primary" onclick="openAddVendorModal()">+ Add Vendor</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tab active" onclick="switchTab('overview')">📊 Overview</div>
+  <div class="tab" onclick="switchTab('qcdsme')">🎯 QCDSME</div>
+  <div class="tab" onclick="switchTab('quality')">✅ Quality Scoring</div>
+  <div class="tab" onclick="switchTab('price')">💰 Price Criteria</div>
+  <div class="tab" onclick="switchTab('combined')">🏆 Combined Results</div>
+  <div class="tab" onclick="switchTab('approval')">🔏 Approval & Governance</div>
+  <div class="tab" onclick="switchTab('settings')">⚙ Settings</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- OVERVIEW PAGE -->
+  <div class="page active" id="page-overview">
+    <!-- Project card -->
+    <div class="project-card">
+      <div class="project-title-row">
+        <h2 id="display-project-title">Project X — Vendor Evaluation</h2>
+        <span class="badge badge-active">Active Evaluation</span>
+      </div>
+      <div class="project-meta">
+        <div class="project-meta-item">
+          <label>Procurement Title</label>
+          <input id="proj-title" type="text" placeholder="Enter project name" value="Project X" oninput="updateProjectTitle(this.value)">
+        </div>
+        <div class="project-meta-item">
+          <label>Evaluation Team</label>
+          <input id="proj-team" type="text" placeholder="Team members" value="Member 1, Member 2, Member 3">
+        </div>
+        <div class="project-meta-item">
+          <label>Quality Weight</label>
+          <span id="proj-q-weight">40%</span>
+        </div>
+        <div class="project-meta-item">
+          <label>Price Weight</label>
+          <span id="proj-p-weight">60%</span>
+        </div>
+        <div class="project-meta-item">
+          <label>Category Type</label>
+          <select id="proj-category" onchange="updateCategory(this.value)">
+            <option value="strategic">Strategic (40:60 to 60:40)</option>
+            <option value="routine">Routine (80:20 to 90:10)</option>
+            <option value="leverage">Leverage (60:40 to 70:30)</option>
+            <option value="bottleneck">Bottleneck (40:60 to 10:90)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-blue">🏢</div>
+        <div class="stat-value" id="stat-vendors">5</div>
+        <div class="stat-label">Vendors Evaluated</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-green">✅</div>
+        <div class="stat-value" id="stat-criteria">7</div>
+        <div class="stat-label">Quality Criteria</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-amber">⚖️</div>
+        <div class="stat-value" id="stat-q-weight">40%</div>
+        <div class="stat-label">Quality Weighting</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-purple">🏆</div>
+        <div class="stat-value" id="stat-top-vendor">—</div>
+        <div class="stat-label">Top Ranked Vendor</div>
+      </div>
+    </div>
+
+    <!-- Main content row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <!-- Rankings -->
+      <div class="card">
+        <div class="card-header">
+          <h3>🏆 Vendor Rankings</h3>
+          <span style="font-size:11px;color:var(--slate-500);">Overall Score (Quality + Price)</span>
+        </div>
+        <div class="card-body" id="rankings-container"></div>
+      </div>
+
+      <!-- Radar chart -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📡 Quality Comparison Radar</h3>
+        </div>
+        <div class="card-body" style="padding-top:10px">
+          <svg id="radar-svg" viewBox="0 0 400 320" width="100%"></svg>
+          <div class="legend" id="radar-legend"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scoring methodology -->
+    <div class="card">
+      <div class="card-header"><h3>📋 Scoring Methodology (0–4 Scale)</h3></div>
+      <div class="card-body">
+        <div class="score-guide">
+          <div class="score-guide-item sg-0">
+            <div class="sg-score">0</div>
+            <div class="sg-label">Unacceptable</div>
+            <div class="sg-desc">Nil or inadequate response. Fails to demonstrate ability to meet requirement.</div>
+          </div>
+          <div class="score-guide-item sg-1">
+            <div class="sg-score">1</div>
+            <div class="sg-label">Poor</div>
+            <div class="sg-desc">Partially relevant but generally poor. Insufficient detail to demonstrate fulfillment.</div>
+          </div>
+          <div class="score-guide-item sg-2">
+            <div class="sg-score">2</div>
+            <div class="sg-label">Acceptable</div>
+            <div class="sg-desc">Relevant and acceptable. Broad understanding but may lack specific details.</div>
+          </div>
+          <div class="score-guide-item sg-3">
+            <div class="sg-score">3</div>
+            <div class="sg-label">Good</div>
+            <div class="sg-desc">Relevant and good. Sufficiently detailed to demonstrate good understanding.</div>
+          </div>
+          <div class="score-guide-item sg-4">
+            <div class="sg-score">4</div>
+            <div class="sg-label">Excellent</div>
+            <div class="sg-desc">Completely relevant and excellent. Comprehensive and unambiguous understanding.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUALITY SCORING PAGE -->
+  <div class="page" id="page-quality">
+    <div class="card">
+      <div class="card-header">
+        <h3>✅ Quality Criteria Scoring</h3>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span id="quality-total-indicator" class="total-indicator total-ok">Weights: 100%</span>
+        </div>
+      </div>
+      <div class="card-body table-wrap">
+        <table id="quality-table">
+          <thead id="quality-thead"></thead>
+          <tbody id="quality-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>📊 Section Score Summary</h3></div>
+      <div class="card-body">
+        <div id="quality-section-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE PAGE -->
+  <div class="page" id="page-price">
+    <div class="card">
+      <div class="card-header"><h3>💰 Price / Cost of Ownership</h3></div>
+      <div class="card-body table-wrap">
+        <table id="price-table">
+          <thead id="price-thead"></thead>
+          <tbody id="price-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMBINED RESULTS PAGE -->
+  <div class="page" id="page-combined">
+    <div class="card">
+      <div class="card-header"><h3>🏆 Combined Price & Quality Results</h3></div>
+      <div class="card-body table-wrap">
+        <table id="combined-table"></table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <div class="card-header"><h3>📊 Overall Score Breakdown</h3></div>
+      <div class="card-body">
+        <svg id="bar-chart-svg" viewBox="0 0 800 280" width="100%" style="max-width:800px;display:block;margin:auto"></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS PAGE -->
+  <div class="page" id="page-settings">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <!-- Quality/Price Weightings -->
+      <div class="card">
+        <div class="card-header"><h3>⚖️ Quality vs Price Weighting</h3></div>
+        <div class="card-body">
+          <div class="weighting-row">
+            <div class="weighting-label"><strong>Quality</strong><br><span style="font-size:11px;color:var(--slate-500)">Technical merit, innovation, sustainability</span></div>
+            <div class="weighting-slider"><input type="range" min="0" max="100" id="quality-weight-slider" value="40" oninput="updateWeights(this.value)"></div>
+            <div class="weighting-pct" id="q-weight-pct">40%</div>
+          </div>
+          <div class="weighting-row">
+            <div class="weighting-label"><strong>Price</strong><br><span style="font-size:11px;color:var(--slate-500)">Total cost of ownership, whole life cost</span></div>
+            <div class="weighting-slider"><input type="range" min="0" max="100" id="price-weight-slider" value="60" oninput="" disabled></div>
+            <div class="weighting-pct" id="p-weight-pct">60%</div>
+          </div>
+          <div style="margin-top:16px;padding:14px;background:var(--blue-50);border-radius:8px;font-size:12px;color:var(--slate-600)">
+            <strong>Procurement Type Guide:</strong><br>
+            Routine: 80:20–90:10 · Leverage: 60:40–70:30 · Strategic: 40:60–60:40 · Bottleneck: 10:90–40:60
+          </div>
+        </div>
+      </div>
+
+      <!-- Quality threshold -->
+      <div class="card">
+        <div class="card-header"><h3>🎯 Quality Thresholds</h3></div>
+        <div class="card-body">
+          <div class="weighting-row">
+            <div class="weighting-label"><strong>Overall Quality Threshold</strong><br><span style="font-size:11px;color:var(--slate-500)">Min score to proceed (0–100%)</span></div>
+            <input type="number" min="0" max="100" id="overall-threshold" value="50" class="weight-input" oninput="recalcAll()">
+            <span style="font-size:13px;color:var(--slate-500)">%</span>
+          </div>
+          <div id="threshold-section-list" style="margin-top:14px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quality sections config -->
+    <div class="card">
+      <div class="card-header"><h3>📝 Quality Criteria Sections & Weightings</h3>
+        <span style="font-size:11px;color:var(--slate-500)">All section weights must total 100%</span>
+      </div>
+      <div class="card-body">
+        <div id="section-weights-list"></div>
+        <div id="section-total-indicator" class="total-indicator total-ok" style="margin-top:14px;max-width:200px">Total: 100%</div>
+      </div>
+    </div>
+
+    <!-- Vendors management -->
+    <div class="card">
+      <div class="card-header"><h3>🏢 Vendors Management</h3></div>
+      <div class="card-body">
+        <div class="vendors-grid" id="vendors-grid-manage"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- QCDSME PAGE                                                   -->
+  <!-- ============================================================ -->
+  <div class="page" id="page-qcdsme">
+    <div class="qcdsme-hero">
+      <div class="qcdsme-hero-text">
+        <h2>QCDSME Vendor Evaluation Framework</h2>
+        <p>A structured multi-dimensional assessment covering Quality, Cost, Delivery, Safety, Morale, and Environment — the gold standard for strategic vendor evaluation.</p>
+      </div>
+      <div class="qcdsme-hero-badges">
+        <span class="qb Q">Q</span><span class="qb C">C</span><span class="qb D">D</span>
+        <span class="qb S">S</span><span class="qb M">M</span><span class="qb E">E</span>
+      </div>
+    </div>
+
+    <!-- QCDSME Weight Config -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <h3>⚖️ QCDSME Dimension Weights</h3>
+        <span id="qcdsme-weight-total" style="font-size:12px;padding:3px 10px;border-radius:12px;font-weight:600;background:var(--green-100);color:var(--green-600)">Total: 100%</span>
+      </div>
+      <div class="card-body">
+        <div id="qcdsme-weight-sliders" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px"></div>
+      </div>
+    </div>
+
+    <!-- QCDSME Scoring Table -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <h3>📊 QCDSME Scoring Matrix</h3>
+        <span style="font-size:11px;color:var(--slate-500)">Score 1–5 per dimension per vendor</span>
+      </div>
+      <div class="card-body table-wrap">
+        <table id="qcdsme-table"></table>
+      </div>
+    </div>
+
+    <!-- QCDSME Radar + Rankings -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+      <div class="card">
+        <div class="card-header"><h3>📡 QCDSME Radar Comparison</h3></div>
+        <div class="card-body">
+          <svg id="qcdsme-radar" viewBox="0 0 400 340" width="100%"></svg>
+          <div class="legend" id="qcdsme-legend"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>🏆 QCDSME Ranking</h3></div>
+        <div class="card-body" id="qcdsme-rankings"></div>
+      </div>
+    </div>
+
+    <!-- Dimension detail cards -->
+    <div class="card">
+      <div class="card-header"><h3>📋 Dimension Criteria Reference</h3></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px" id="qcdsme-criteria-ref"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- APPROVAL & GOVERNANCE PAGE                                    -->
+  <!-- ============================================================ -->
+  <div class="page" id="page-approval">
+
+    <!-- Governance Header Banner -->
+    <div class="gov-banner">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;opacity:0.8;margin-bottom:6px">Procurement Governance Framework</div>
+        <div style="font-size:20px;font-weight:800">Vendor Approval & Authorization Matrix</div>
+        <div style="font-size:13px;opacity:0.8;margin-top:6px">ISO 9001 · CIPS · UN Procurement Manual · World Bank Procurement Guidelines</div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div class="gov-stat"><div class="gov-stat-val" id="gov-pending">0</div><div class="gov-stat-lbl">Pending</div></div>
+        <div class="gov-stat"><div class="gov-stat-val" id="gov-approved">0</div><div class="gov-stat-lbl">Approved</div></div>
+        <div class="gov-stat"><div class="gov-stat-val" id="gov-rejected">0</div><div class="gov-stat-lbl">Rejected</div></div>
+        <div class="gov-stat"><div class="gov-stat-val" id="gov-conditional">0</div><div class="gov-stat-lbl">Conditional</div></div>
+      </div>
+    </div>
+
+    <!-- Approval Pipeline -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <h3>🔄 Approval Pipeline — Stage Gate Process</h3>
+        <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openApprovalModal()">+ New Approval Request</button>
+      </div>
+      <div class="card-body">
+        <!-- Stage Gate Visual -->
+        <div class="stage-gate-row" id="stage-gate-visual"></div>
+        <!-- Pipeline table -->
+        <div style="margin-top:20px" class="table-wrap">
+          <table id="approval-pipeline-table"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column: Authority Matrix + Checklist -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+
+      <!-- Delegation of Authority Matrix -->
+      <div class="card">
+        <div class="card-header"><h3>📐 Delegation of Authority (DoA) Matrix</h3></div>
+        <div class="card-body">
+          <div class="doa-intro">Approval authority is determined by contract value and risk level in accordance with procurement policy.</div>
+          <table class="doa-table">
+            <thead><tr><th>Contract Value</th><th>Risk Level</th><th>Approver Level</th><th>Quorum</th></tr></thead>
+            <tbody>
+              <tr><td>&lt; $10,000</td><td><span class="risk-chip low">Low</span></td><td>Purchasing Officer</td><td>1 person</td></tr>
+              <tr><td>$10K – $50K</td><td><span class="risk-chip low">Low–Med</span></td><td>Procurement Manager</td><td>1 person</td></tr>
+              <tr><td>$50K – $200K</td><td><span class="risk-chip med">Medium</span></td><td>Head of Procurement + Finance</td><td>2 persons</td></tr>
+              <tr><td>$200K – $1M</td><td><span class="risk-chip med">Medium–High</span></td><td>Tender Board (VP Level)</td><td>3 persons</td></tr>
+              <tr><td>$1M – $5M</td><td><span class="risk-chip high">High</span></td><td>C-Suite + Legal + Finance</td><td>4 persons</td></tr>
+              <tr><td>&gt; $5M</td><td><span class="risk-chip high">Critical</span></td><td>Board of Directors</td><td>Majority quorum</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pre-Award Checklist -->
+      <div class="card">
+        <div class="card-header"><h3>✅ Pre-Award Compliance Checklist</h3></div>
+        <div class="card-body">
+          <div style="font-size:12px;color:var(--slate-500);margin-bottom:12px">Mandatory checks before contract award per procurement governance policy</div>
+          <div id="pre-award-checklist"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Three-column: Conflict of Interest + Audit Trail + SLA -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px">
+
+      <!-- COI Register -->
+      <div class="card">
+        <div class="card-header"><h3>⚠️ Conflict of Interest Register</h3></div>
+        <div class="card-body">
+          <div id="coi-register"></div>
+        </div>
+      </div>
+
+      <!-- Audit Trail -->
+      <div class="card">
+        <div class="card-header"><h3>📜 Audit Trail</h3></div>
+        <div class="card-body" style="padding:0">
+          <div id="audit-trail" style="max-height:300px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+      <!-- Post-Award KPI -->
+      <div class="card">
+        <div class="card-header"><h3>📈 Vendor Performance KPIs</h3></div>
+        <div class="card-body">
+          <div id="vendor-kpi-panel"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Approval Decision Panel -->
+    <div class="card">
+      <div class="card-header"><h3>🗳️ Approval Decision Panel — Evaluator Votes</h3></div>
+      <div class="card-body">
+        <div id="approval-decision-panel"></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- APPROVAL REQUEST MODAL                                        -->
+<!-- ============================================================ -->
+<div class="wizard-overlay" id="approval-modal" style="z-index:700">
+  <div class="wizard-modal" style="max-width:560px">
+    <div class="wiz-header">
+      <div class="wiz-title-row">
+        <div class="wiz-title">🔏 New Approval Request</div>
+        <button class="wiz-close" onclick="closeApprovalModal()">✕</button>
+      </div>
+    </div>
+    <div class="wiz-body" style="padding:24px 28px">
+      <div class="wiz-grid wiz-grid-2">
+        <div class="wf-group span2">
+          <label class="wf-label">Vendor <span class="required">*</span></label>
+          <select id="apr-vendor" class="wf-select"></select>
+        </div>
+        <div class="wf-group">
+          <label class="wf-label">Approval Stage <span class="required">*</span></label>
+          <select id="apr-stage" class="wf-select">
+            <option value="">— Select —</option>
+            <option value="pre_qual">Stage 1 · Pre-Qualification</option>
+            <option value="tech_eval">Stage 2 · Technical Evaluation</option>
+            <option value="commercial">Stage 3 · Commercial Review</option>
+            <option value="legal">Stage 4 · Legal & Compliance</option>
+            <option value="award">Stage 5 · Award Recommendation</option>
+            <option value="contract">Stage 6 · Contract Execution</option>
+          </select>
+        </div>
+        <div class="wf-group">
+          <label class="wf-label">Priority</label>
+          <select id="apr-priority" class="wf-select">
+            <option value="normal">Normal</option>
+            <option value="urgent">Urgent</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+        <div class="wf-group">
+          <label class="wf-label">Contract Value (USD)</label>
+          <input id="apr-value" class="wf-input" type="number" placeholder="e.g. 150000">
+        </div>
+        <div class="wf-group">
+          <label class="wf-label">Required By Date</label>
+          <input id="apr-deadline" class="wf-input" type="date">
+        </div>
+        <div class="wf-group span2">
+          <label class="wf-label">Justification / Notes</label>
+          <textarea id="apr-notes" class="wf-textarea" placeholder="Explain the basis for approval request, key findings, and recommendation..."></textarea>
+        </div>
+        <div class="wf-group span2">
+          <label class="wf-label">Requested By</label>
+          <input id="apr-requester" class="wf-input" type="text" placeholder="Your name / role">
+        </div>
+      </div>
+    </div>
+    <div class="wiz-footer">
+      <div class="wiz-footer-left">Approval will be routed per DoA matrix</div>
+      <div class="wiz-footer-right">
+        <button class="btn btn-outline" onclick="closeApprovalModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitApprovalRequest()">Submit for Approval →</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="wizard-overlay" id="add-vendor-modal">
+  <div class="wizard-modal">
+
+    <!-- Header -->
+    <div class="wiz-header">
+      <div class="wiz-title-row">
+        <div class="wiz-title">🏢 Register New Vendor</div>
+        <button class="wiz-close" onclick="closeModal()">✕</button>
+      </div>
+      <!-- Step tabs -->
+      <div class="wiz-steps">
+        <div class="wiz-step-tab active" id="stab-1"><span class="wiz-step-num">1</span>Identity</div>
+        <div class="wiz-step-tab" id="stab-2"><span class="wiz-step-num">2</span>Capability</div>
+        <div class="wiz-step-tab" id="stab-3"><span class="wiz-step-num">3</span>Compliance</div>
+        <div class="wiz-step-tab" id="stab-4"><span class="wiz-step-num">4</span>Financial</div>
+        <div class="wiz-step-tab" id="stab-5"><span class="wiz-step-num">5</span>Risk Profile</div>
+      </div>
+    </div>
+    <div class="wiz-progress-bar"><div class="wiz-progress-fill" id="wiz-progress" style="width:20%"></div></div>
+
+    <!-- Body -->
+    <div class="wiz-body">
+
+      <!-- STEP 1: Identity & Contact -->
+      <div class="wiz-page active" id="wstep-1">
+        <div class="wiz-callout">ℹ️ Basic identity information used for identification and correspondence throughout the evaluation process.</div>
+        <div class="wiz-section-title">🏢 Company Identity</div>
+        <div class="wiz-grid wiz-grid-2">
+          <div class="wf-group span2">
+            <label class="wf-label">Legal / Company Name <span class="required">*</span></label>
+            <input id="v-name" class="wf-input" type="text" placeholder="e.g. PT Acme Solutions Indonesia">
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Trading / Brand Name <span class="hint">(if different)</span></label>
+            <input id="v-brand" class="wf-input" type="text" placeholder="e.g. Acme Solutions">
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Vendor Code / Reference</label>
+            <input id="v-code" class="wf-input" type="text" placeholder="e.g. VND-2024-001">
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Business Registration No. <span class="required">*</span></label>
+            <input id="v-regno" class="wf-input" type="text" placeholder="e.g. 0619516522939">
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Tax ID / NPWP</label>
+            <input id="v-tax" class="wf-input" type="text" placeholder="e.g. 01.234.567.8-901.000">
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Country of Incorporation <span class="required">*</span></label>
+            <select id="v-country" class="wf-select">
+              <option value="">— Select country —</option>
+              <option>Indonesia</option><option>Singapore</option><option>Malaysia</option>
+              <option>Thailand</option><option>Vietnam</option><option>Philippines</option>
+              <option>Japan</option><option>South Korea</option><option>China</option>
+              <option>India</option><option>Australia</option><option>United States</option>
+              <option>United Kingdom</option><option>Germany</option><option>Netherlands</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Year Established</label>
+            <input id="v-year" class="wf-input" type="number" min="1900" max="2024" placeholder="e.g. 2010">
+          </div>
+        </div>
+
+        <div class="wiz-section-title" style="margin-top:20px">👤 Primary Contact</div>
+        <div class="wiz-grid wiz-grid-2">
+          <div class="wf-group">
+            <label class="wf-label">Contact Person Name <span class="required">*</span></label>
+            <input id="v-contact" class="wf-input" type="text" placeholder="Full name">
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Job Title / Role</label>
+            <input id="v-title" class="wf-input" type="text" placeholder="e.g. Business Development Manager">
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Email Address <span class="required">*</span></label>
+            <input id="v-email" class="wf-input" type="email" placeholder="contact@company.com">
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Phone / WhatsApp</label>
+            <input id="v-phone" class="wf-input" type="text" placeholder="+62 812 3456 7890">
+          </div>
+          <div class="wf-group span2">
+            <label class="wf-label">Office Address</label>
+            <textarea id="v-address" class="wf-textarea" placeholder="Street, City, Province, Postal Code"></textarea>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Website</label>
+            <input id="v-web" class="wf-input" type="url" placeholder="https://www.company.com">
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">LinkedIn / Company Profile URL</label>
+            <input id="v-linkedin" class="wf-input" type="url" placeholder="https://linkedin.com/company/...">
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Business Capability -->
+      <div class="wiz-page" id="wstep-2">
+        <div class="wiz-callout">ℹ️ Capability data helps evaluate whether the vendor has sufficient experience and capacity to deliver the contract requirements.</div>
+        <div class="wiz-section-title">🔧 Business Capability</div>
+        <div class="wiz-grid wiz-grid-2">
+          <div class="wf-group">
+            <label class="wf-label">Vendor Category <span class="required">*</span></label>
+            <select id="v-category" class="wf-select">
+              <option value="">— Select —</option>
+              <option>IT / Software Solutions</option>
+              <option>IT / Hardware & Infrastructure</option>
+              <option>Professional Services / Consulting</option>
+              <option>Construction & Engineering</option>
+              <option>Manufacturing / Supply of Goods</option>
+              <option>Logistics & Distribution</option>
+              <option>Facility Management</option>
+              <option>Marketing & Creative Services</option>
+              <option>Training & Education</option>
+              <option>Healthcare / Medical Devices</option>
+              <option>Other Services</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Company Size</label>
+            <select id="v-size" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Micro (&lt; 10 employees)</option>
+              <option>Small (10–49 employees)</option>
+              <option>Medium (50–249 employees)</option>
+              <option>Large (250–999 employees)</option>
+              <option>Enterprise (1,000+ employees)</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Years of Relevant Experience</label>
+            <select id="v-exp" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Less than 1 year</option>
+              <option>1–3 years</option>
+              <option>3–5 years</option>
+              <option>5–10 years</option>
+              <option>More than 10 years</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Geographical Coverage</label>
+            <select id="v-geo" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Local / City-level</option>
+              <option>National</option>
+              <option>Regional (ASEAN)</option>
+              <option>Asia Pacific</option>
+              <option>Global</option>
+            </select>
+          </div>
+          <div class="wf-group span2">
+            <label class="wf-label">Key Products / Services Offered <span class="hint">(brief description)</span></label>
+            <textarea id="v-products" class="wf-textarea" placeholder="Describe main products/services relevant to this procurement..."></textarea>
+          </div>
+          <div class="wf-group span2">
+            <label class="wf-label">Notable Clients / References <span class="hint">(list up to 3)</span></label>
+            <textarea id="v-clients" class="wf-textarea" placeholder="e.g. PT Telkom Indonesia, Bank Mandiri, Pertamina..."></textarea>
+          </div>
+        </div>
+
+        <div class="wiz-section-title" style="margin-top:20px">🎓 Certifications & Accreditations</div>
+        <div class="wf-label" style="margin-bottom:8px">Held Certifications <span class="hint">(select all that apply)</span></div>
+        <div class="wf-checkbox-group" id="cert-group">
+          <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="ISO 9001">ISO 9001</label>
+          <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="ISO 27001">ISO 27001</label>
+          <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="ISO 14001">ISO 14001</label>
+          <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="ISO 45001">ISO 45001</label>
+          <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="SOC 2">SOC 2</label>
+          <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="CMMI">CMMI</label>
+          <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="PCI DSS">PCI DSS</label>
+          <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="OHSAS 18001">OHSAS 18001</label>
+          <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="TKDN">TKDN</label>
+          <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="SNI">SNI</label>
+        </div>
+        <div class="wf-group" style="margin-top:12px">
+          <label class="wf-label">Other Certifications <span class="hint">(comma-separated)</span></label>
+          <input id="v-other-certs" class="wf-input" type="text" placeholder="e.g. AWS Partner, Microsoft Gold, TOGAF...">
+        </div>
+
+        <div class="wiz-section-title" style="margin-top:20px">⭐ Past Performance Rating</div>
+        <div class="wf-label" style="margin-bottom:8px">Overall vendor reputation (if previously evaluated or known)</div>
+        <div class="wf-star-row" id="star-row">
+          <span class="wf-star" data-val="1" onclick="setStars(1)">★</span>
+          <span class="wf-star" data-val="2" onclick="setStars(2)">★</span>
+          <span class="wf-star" data-val="3" onclick="setStars(3)">★</span>
+          <span class="wf-star" data-val="4" onclick="setStars(4)">★</span>
+          <span class="wf-star" data-val="5" onclick="setStars(5)">★</span>
+          <span id="star-label" style="font-size:12px;color:var(--slate-500);margin-left:8px">Not rated</span>
+        </div>
+      </div>
+
+      <!-- STEP 3: Compliance & Legal -->
+      <div class="wiz-page" id="wstep-3">
+        <div class="wiz-callout">⚖️ Compliance information is mandatory to verify vendor eligibility and mitigate legal/regulatory risk before contract award.</div>
+        <div class="wiz-section-title">📋 Legal & Regulatory Compliance</div>
+        <div class="wiz-grid wiz-grid-2">
+          <div class="wf-group">
+            <label class="wf-label">Business License Status</label>
+            <select id="v-license" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Active / Valid</option>
+              <option>Pending Renewal</option>
+              <option>Expired</option>
+              <option>Not Applicable</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Tax Compliance Status</label>
+            <select id="v-taxstatus" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Compliant (up-to-date)</option>
+              <option>Pending Clearance</option>
+              <option>Non-compliant</option>
+              <option>Exempt</option>
+            </select>
+          </div>
+          <div class="wf-group span2">
+            <label class="wf-label">On Government Blacklist / Debarment List?</label>
+            <div class="risk-options" style="margin-top:6px">
+              <div class="risk-opt low selected" id="blacklist-no" onclick="setBlacklist('no')">✓ No — Cleared</div>
+              <div class="risk-opt high" id="blacklist-yes" onclick="setBlacklist('yes')">✗ Yes — Listed</div>
+              <div class="risk-opt medium" id="blacklist-unknown" onclick="setBlacklist('unknown')">? Unknown / Not Checked</div>
+            </div>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Anti-Bribery Policy in Place?</label>
+            <select id="v-antibrib" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Yes — documented policy</option>
+              <option>Yes — informal policy</option>
+              <option>No</option>
+              <option>Unknown</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">GDPR / Data Privacy Compliance</label>
+            <select id="v-gdpr" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Fully compliant</option>
+              <option>Partially compliant</option>
+              <option>In progress</option>
+              <option>Not applicable</option>
+              <option>Non-compliant</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Local Content Requirement (TKDN) %</label>
+            <input id="v-tkdn" class="wf-input" type="number" min="0" max="100" placeholder="e.g. 40">
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Ownership Structure</label>
+            <select id="v-ownership" class="wf-select">
+              <option value="">— Select —</option>
+              <option>100% Local / Domestic</option>
+              <option>Joint Venture (Local majority)</option>
+              <option>Joint Venture (Foreign majority)</option>
+              <option>100% Foreign-owned</option>
+              <option>State-owned enterprise (BUMN)</option>
+              <option>Cooperative (Koperasi)</option>
+            </select>
+          </div>
+          <div class="wf-group span2">
+            <label class="wf-label">Any Ongoing Legal Disputes or Litigation?</label>
+            <textarea id="v-legal" class="wf-textarea" placeholder="Describe any pending lawsuits, sanctions, or disputes. Leave blank if none."></textarea>
+          </div>
+          <div class="wf-group span2">
+            <label class="wf-label">ESG / Sustainability Commitment <span class="hint">(select all that apply)</span></label>
+            <div class="wf-checkbox-group" id="esg-group">
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="Net Zero Target">Net Zero Target</label>
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="Carbon Reporting">Carbon Reporting</label>
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="Fair Wage Policy">Fair Wage Policy</label>
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="Diversity & Inclusion">Diversity & Inclusion</label>
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="No Child Labour Policy">No Child Labour</label>
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="Ethical Supply Chain">Ethical Supply Chain</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Financial Standing -->
+      <div class="wiz-page" id="wstep-4">
+        <div class="wiz-callout">💰 Financial health indicators help assess vendor viability and capacity to deliver. Vendors with weak financials present delivery risk.</div>
+        <div class="wiz-section-title">💵 Financial Overview</div>
+        <div class="wiz-grid wiz-grid-2">
+          <div class="wf-group">
+            <label class="wf-label">Annual Turnover (USD, latest year)</label>
+            <select id="v-turnover" class="wf-select">
+              <option value="">— Select range —</option>
+              <option>Under $100K</option>
+              <option>$100K – $500K</option>
+              <option>$500K – $1M</option>
+              <option>$1M – $5M</option>
+              <option>$5M – $20M</option>
+              <option>$20M – $100M</option>
+              <option>Over $100M</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Revenue Growth Trend</label>
+            <select id="v-growth" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Growing (&gt;10% YoY)</option>
+              <option>Stable (0–10% YoY)</option>
+              <option>Declining</option>
+              <option>Not disclosed</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Audited Financial Statements Available?</label>
+            <select id="v-audited" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Yes — latest 3 years</option>
+              <option>Yes — latest 1 year</option>
+              <option>No — unaudited only</option>
+              <option>Not willing to disclose</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Current Profitability</label>
+            <select id="v-profit" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Profitable</option>
+              <option>Break-even</option>
+              <option>Operating at loss</option>
+              <option>Not disclosed</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Debt / Leverage Level</label>
+            <select id="v-debt" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Low (Debt/Equity &lt; 0.5)</option>
+              <option>Moderate (Debt/Equity 0.5–1.5)</option>
+              <option>High (Debt/Equity &gt; 1.5)</option>
+              <option>Not disclosed</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Credit / Payment Terms Requested</label>
+            <select id="v-credit" class="wf-select">
+              <option value="">— Select —</option>
+              <option>COD / Advance payment required</option>
+              <option>NET 14</option>
+              <option>NET 30</option>
+              <option>NET 60</option>
+              <option>NET 90+</option>
+            </select>
+          </div>
+          <div class="wf-group span2">
+            <label class="wf-label">Insurance Coverage <span class="hint">(select all that apply)</span></label>
+            <div class="wf-checkbox-group" id="ins-group">
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="Public Liability">Public Liability</label>
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="Professional Indemnity">Professional Indemnity</label>
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="Product Liability">Product Liability</label>
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="Workers Compensation">Workers Compensation</label>
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="Cyber Insurance">Cyber Insurance</label>
+              <label class="wf-checkbox-item" onclick="toggleCheck(this)"><input type="checkbox" value="Performance Bond">Performance Bond</label>
+            </div>
+          </div>
+          <div class="wf-group span2">
+            <label class="wf-label">Bank Reference / Financial Guarantor</label>
+            <input id="v-bank" class="wf-input" type="text" placeholder="e.g. Bank BCA, Bank Mandiri — willing to provide bank reference letter">
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: Risk Profile & Notes -->
+      <div class="wiz-page" id="wstep-5">
+        <div class="wiz-callout">🔐 Risk profiling ensures the evaluation team is aware of potential delivery, dependency, and concentration risks before shortlisting.</div>
+        <div class="wiz-section-title">⚠️ Risk Assessment</div>
+        <div class="wiz-grid wiz-grid-2">
+          <div class="wf-group">
+            <label class="wf-label">Supply Chain Risk Level</label>
+            <div class="risk-options" style="margin-top:6px">
+              <div class="risk-opt low selected" id="scr-low" onclick="setRisk('sc','low')">🟢 Low</div>
+              <div class="risk-opt medium" id="scr-medium" onclick="setRisk('sc','medium')">🟡 Medium</div>
+              <div class="risk-opt high" id="scr-high" onclick="setRisk('sc','high')">🔴 High</div>
+            </div>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Dependency / Single-Source Risk</label>
+            <div class="risk-options" style="margin-top:6px">
+              <div class="risk-opt low selected" id="dep-low" onclick="setRisk('dep','low')">🟢 Low</div>
+              <div class="risk-opt medium" id="dep-medium" onclick="setRisk('dep','medium')">🟡 Medium</div>
+              <div class="risk-opt high" id="dep-high" onclick="setRisk('dep','high')">🔴 High</div>
+            </div>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Geopolitical / Country Risk</label>
+            <div class="risk-options" style="margin-top:6px">
+              <div class="risk-opt low selected" id="geo-low" onclick="setRisk('geo','low')">🟢 Low</div>
+              <div class="risk-opt medium" id="geo-medium" onclick="setRisk('geo','medium')">🟡 Medium</div>
+              <div class="risk-opt high" id="geo-high" onclick="setRisk('geo','high')">🔴 High</div>
+            </div>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Technology / Obsolescence Risk</label>
+            <div class="risk-options" style="margin-top:6px">
+              <div class="risk-opt low selected" id="tech-low" onclick="setRisk('tech','low')">🟢 Low</div>
+              <div class="risk-opt medium" id="tech-medium" onclick="setRisk('tech','medium')">🟡 Medium</div>
+              <div class="risk-opt high" id="tech-high" onclick="setRisk('tech','high')">🔴 High</div>
+            </div>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Subcontracting Dependency</label>
+            <select id="v-subcon" class="wf-select">
+              <option value="">— Select —</option>
+              <option>None — delivers entirely in-house</option>
+              <option>Minimal (&lt;20% subcontracted)</option>
+              <option>Moderate (20–50% subcontracted)</option>
+              <option>Significant (&gt;50% subcontracted)</option>
+            </select>
+          </div>
+          <div class="wf-group">
+            <label class="wf-label">Key Person Dependency</label>
+            <select id="v-keyperson" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Low — strong team, not key-person dependent</option>
+              <option>Medium — some key staff dependency</option>
+              <option>High — delivery relies on 1–2 individuals</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="wiz-section-title" style="margin-top:20px">📝 Evaluation Notes</div>
+        <div class="wiz-grid wiz-grid-2">
+          <div class="wf-group span2">
+            <label class="wf-label">How Vendor Was Sourced / Found</label>
+            <select id="v-source" class="wf-select">
+              <option value="">— Select —</option>
+              <option>Open tender / public advertisement</option>
+              <option>Existing approved vendor list (AVL)</option>
+              <option>Referral / recommendation</option>
+              <option>Direct approach by vendor</option>
+              <option>Market research</option>
+              <option>Previous contract</option>
+            </select>
+          </div>
+          <div class="wf-group span2">
+            <label class="wf-label">Conflict of Interest Declaration</label>
+            <select id="v-coi" class="wf-select">
+              <option value="">— Select —</option>
+              <option>No conflict declared</option>
+              <option>Potential conflict — disclosed and managed</option>
+              <option>Conflict identified — vendor disqualified</option>
+            </select>
+          </div>
+          <div class="wf-group span2">
+            <label class="wf-label">Evaluator Notes / Remarks</label>
+            <textarea id="v-notes" class="wf-textarea" style="min-height:90px" placeholder="Any additional observations, red flags, or commendations regarding this vendor..."></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end wiz-body -->
+
+    <!-- Footer -->
+    <div class="wiz-footer">
+      <div class="wiz-footer-left" id="wiz-step-counter">Step 1 of 5</div>
+      <div class="wiz-footer-right">
+        <button class="btn btn-outline" id="wiz-back-btn" onclick="wizBack()" style="display:none">← Back</button>
+        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="wiz-next-btn" onclick="wizNext()">Next →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">Saved!</div>
+
+<script>
+// ============================================================
+// DATA MODEL
+// ============================================================
+const COLORS = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316'];
+
+const state = {
+  projectTitle: 'Project X',
+  qualityWeight: 40,
+  priceWeight: 60,
+  overallThreshold: 50,
+  vendors: [
+    { id:1, name:'Alpha Tech Solutions', brand:'Alpha Tech', contact:'Ahmad Fauzi', contactTitle:'BD Manager', email:'ahmad@alphatech.id', phone:'+62 812 1111 1111', country:'Indonesia', yearEstablished:'2012', category:'IT / Software Solutions', companySize:'Medium (50–249 employees)', experience:'5–10 years', geoCoverage:'National', certifications:['ISO 9001','ISO 27001'], starRating:4, blacklisted:'no', tkdn:'40', ownership:'100% Local / Domestic', taxStatus:'Compliant (up-to-date)', licenseStatus:'Active / Valid', turnover:'$5M – $20M', profitability:'Profitable', riskSupplyChain:'low', riskDependency:'low', riskGeo:'low', riskTech:'low', esg:['Fair Wage Policy','Diversity & Inclusion'], insurance:['Professional Indemnity','Cyber Insurance'], sourcedVia:'Existing approved vendor list (AVL)', conflictOfInterest:'No conflict declared', notes:'Strong past performance on similar government IT contracts.', registeredAt:'01/01/2024' },
+    { id:2, name:'Beta Systems Group', brand:'BetaSys', contact:'Siti Rahayu', contactTitle:'Sales Director', email:'siti@betasys.sg', phone:'+65 9 222 2222', country:'Singapore', yearEstablished:'2008', category:'IT / Software Solutions', companySize:'Large (250–999 employees)', experience:'More than 10 years', geoCoverage:'Regional (ASEAN)', certifications:['ISO 9001','ISO 27001','SOC 2','CMMI'], starRating:5, blacklisted:'no', tkdn:'15', ownership:'Joint Venture (Foreign majority)', taxStatus:'Compliant (up-to-date)', licenseStatus:'Active / Valid', turnover:'$20M – $100M', profitability:'Profitable', riskSupplyChain:'low', riskDependency:'low', riskGeo:'low', riskTech:'low', esg:['Net Zero Target','Carbon Reporting','Fair Wage Policy'], insurance:['Public Liability','Professional Indemnity','Cyber Insurance'], sourcedVia:'Open tender / public advertisement', conflictOfInterest:'No conflict declared', notes:'Regional market leader with excellent SLA track record.', registeredAt:'01/01/2024' },
+    { id:3, name:'Gamma Innovations', brand:'GammaX', contact:'Budi Santoso', contactTitle:'CEO', email:'budi@gammax.id', phone:'+62 821 3333 3333', country:'Indonesia', yearEstablished:'2018', category:'IT / Software Solutions', companySize:'Small (10–49 employees)', experience:'3–5 years', geoCoverage:'Local / City-level', certifications:['ISO 9001'], starRating:3, blacklisted:'no', tkdn:'60', ownership:'100% Local / Domestic', taxStatus:'Compliant (up-to-date)', licenseStatus:'Active / Valid', turnover:'$500K – $1M', profitability:'Break-even', riskSupplyChain:'medium', riskDependency:'high', riskGeo:'low', riskTech:'medium', esg:['Fair Wage Policy'], insurance:['Public Liability'], sourcedVia:'Referral / recommendation', conflictOfInterest:'No conflict declared', notes:'Innovative startup with high TKDN score. Key-person risk noted.', registeredAt:'01/01/2024' },
+    { id:4, name:'Delta Corp Services', brand:'Delta Corp', contact:'Rina Wijaya', contactTitle:'Account Manager', email:'rina@deltacorp.my', phone:'+60 12 444 4444', country:'Malaysia', yearEstablished:'2005', category:'Professional Services / Consulting', companySize:'Large (250–999 employees)', experience:'More than 10 years', geoCoverage:'Regional (ASEAN)', certifications:['ISO 9001','ISO 14001','OHSAS 18001'], starRating:3, blacklisted:'no', tkdn:'10', ownership:'100% Foreign-owned', taxStatus:'Compliant (up-to-date)', licenseStatus:'Active / Valid', turnover:'$20M – $100M', profitability:'Profitable', riskSupplyChain:'low', riskDependency:'medium', riskGeo:'medium', riskTech:'low', esg:['Carbon Reporting','Ethical Supply Chain'], insurance:['Public Liability','Professional Indemnity','Workers Compensation'], sourcedVia:'Market research', conflictOfInterest:'No conflict declared', notes:'Foreign entity — check TKDN compliance. Strong regional references.', registeredAt:'01/01/2024' },
+    { id:5, name:'Epsilon Digital', brand:'EpsD', contact:'Dian Prakoso', contactTitle:'Project Director', email:'dian@epsilond.id', phone:'+62 817 5555 5555', country:'Indonesia', yearEstablished:'2015', category:'IT / Software Solutions', companySize:'Medium (50–249 employees)', experience:'5–10 years', geoCoverage:'National', certifications:['ISO 9001','ISO 27001','PCI DSS'], starRating:4, blacklisted:'no', tkdn:'45', ownership:'100% Local / Domestic', taxStatus:'Compliant (up-to-date)', licenseStatus:'Active / Valid', turnover:'$5M – $20M', profitability:'Profitable', riskSupplyChain:'low', riskDependency:'low', riskGeo:'low', riskTech:'low', esg:['Fair Wage Policy','No Child Labour Policy','Ethical Supply Chain'], insurance:['Professional Indemnity','Cyber Insurance','Performance Bond'], sourcedVia:'Existing approved vendor list (AVL)', conflictOfInterest:'No conflict declared', notes:'Consistently high performance. Preferred for digital transformation projects.', registeredAt:'01/01/2024' },
+  ],
+  qualitySections: [
+    {
+      id:'S1', name:'Functionality', weight:25, threshold:50,
+      questions:[
+        {id:'Q1', text:'What are the characteristics of the proposed solution?'},
+        {id:'Q2', text:'Provide design details and technical specifications'},
+        {id:'Q3', text:'Provide detail of the functionality and integration capabilities'},
+      ]
+    },
+    {
+      id:'S2', name:'Methodology', weight:20, threshold:50,
+      questions:[
+        {id:'Q4', text:'Describe how the system will be implemented and deployed'},
+        {id:'Q5', text:'What processes will be adopted for project management?'},
+        {id:'Q6', text:'Describe quality assurance and testing methodology'},
+      ]
+    },
+    {
+      id:'S3', name:'Innovation', weight:15, threshold:40,
+      questions:[
+        {id:'Q7', text:'Describe innovative features or approaches proposed'},
+        {id:'Q8', text:'How does the solution leverage emerging technologies?'},
+      ]
+    },
+    {
+      id:'S4', name:'Maintainability', weight:15, threshold:40,
+      questions:[
+        {id:'Q9', text:'Describe maintenance and support plans'},
+        {id:'Q10', text:'What SLAs and response times are guaranteed?'},
+        {id:'Q11', text:'Describe upgrade and patch management approach'},
+      ]
+    },
+    {
+      id:'S5', name:'After-sales Support', weight:10, threshold:40,
+      questions:[
+        {id:'Q12', text:'Describe customer support channels and availability'},
+        {id:'Q13', text:'What training will be provided to end users?'},
+        {id:'Q14', text:'Describe knowledge transfer and documentation'},
+      ]
+    },
+    {
+      id:'S6', name:'Security', weight:10, threshold:50,
+      questions:[
+        {id:'Q15', text:'Describe data security and compliance frameworks'},
+        {id:'Q16', text:'What certifications does the company hold (ISO, SOC2)?'},
+        {id:'Q17', text:'Describe incident response and recovery procedures'},
+      ]
+    },
+    {
+      id:'S7', name:'Sustainability', weight:5, threshold:30,
+      questions:[
+        {id:'Q18', text:'Describe environmental impact and green credentials'},
+        {id:'Q19', text:'What CSR or sustainability initiatives are in place?'},
+        {id:'Q20', text:'Describe social responsibility and ethical supply chain'},
+      ]
+    },
+  ],
+  priceSections: [
+    {
+      name:'Acquisition / Initial Capital Expenditure',
+      items:['Price of Goods / Services','Material','Labour / Hourly Rate','Overheads','Packaging','Profit']
+    },
+    {
+      name:'Commissioning Costs',
+      items:['Delivery','Installation','Training','Travel']
+    },
+    {
+      name:'Operating / Recurrent Costs',
+      items:['Maintenance','Spares','Energy / Fuel Consumption','Upgrade Costs','Consumables']
+    },
+    {
+      name:'End of Life / Disposal / Exit',
+      items:['Disposal / Exit Costs','Less Residual Value']
+    }
+  ],
+  // scores[vendorId][questionId] = 0-4
+  scores: {},
+  // prices[vendorId][itemName] = number
+  prices: {},
+  nextVendorId: 6,
+
+  // QCDSME dimensions with weights and scoring criteria
+  qcdsme: {
+    dims: [
+      { id:'Q', label:'Quality', color:'#2563EB', bg:'#EFF6FF', weight:25,
+        subtitle:'Product/Service conformance & reliability',
+        criteria:['Defect rate & rejection rate','Conformance to specifications','ISO/QMS certification level','Customer complaint frequency','Corrective action responsiveness'] },
+      { id:'C', label:'Cost', color:'#16A34A', bg:'#F0FDF4', weight:25,
+        subtitle:'Total cost competitiveness & transparency',
+        criteria:['Total cost of ownership (TCO)','Price competitiveness vs market','Payment terms flexibility','Hidden cost transparency','Cost reduction track record'] },
+      { id:'D', label:'Delivery', color:'#D97706', bg:'#FFFBEB', weight:20,
+        subtitle:'On-time delivery & lead time performance',
+        criteria:['On-time delivery rate (OTD)','Lead time reliability','Order fulfillment accuracy','Emergency/expedite capability','Supply chain resilience'] },
+      { id:'S', label:'Safety', color:'#DC2626', bg:'#FEF2F2', weight:15,
+        subtitle:'HSE standards & workplace safety record',
+        criteria:['LTIFR (Lost Time Injury Freq. Rate)','HSE certification & compliance','Safety incident history','Emergency response plan','Worker welfare standards'] },
+      { id:'M', label:'Morale', color:'#7C3AED', bg:'#F5F3FF', weight:10,
+        subtitle:'People, culture & service attitude',
+        criteria:['Responsiveness & communication','Problem resolution attitude','Staff stability & turnover rate','Collaborative mindset','Post-sale support quality'] },
+      { id:'E', label:'Environment', color:'#0891B2', bg:'#ECFEFF', weight:5,
+        subtitle:'Environmental impact & ESG commitment',
+        criteria:['Carbon footprint & reduction plan','Waste & effluent management','Environmental certifications (ISO 14001)','Sustainable sourcing practices','Regulatory environmental compliance'] },
+    ],
+    // scores[vendorId][dimId] = 1-5
+    scores: {},
+  },
+
+  // Approval workflow
+  approvals: [
+    { id:'APR-001', vendorId:1, stage:'tech_eval', status:'approved', priority:'normal', value:85000, deadline:'2024-03-15', requester:'Siti Nurhaliza', notes:'Technical evaluation completed. All criteria met. Recommended for commercial review.', submittedAt:'2024-03-01', resolvedAt:'2024-03-10', votes:{ approve:['Ahmad F.','Budi S.'], reject:[], conditional:[], abstain:['Rina W.'] } },
+    { id:'APR-002', vendorId:2, stage:'award', status:'approved', priority:'urgent', value:220000, deadline:'2024-03-20', requester:'Budi Santoso', notes:'Highest combined QCDSME score. Recommend for contract award.', submittedAt:'2024-03-05', resolvedAt:'2024-03-18', votes:{ approve:['Ahmad F.','Siti R.','Budi S.'], reject:[], conditional:[], abstain:[] } },
+    { id:'APR-003', vendorId:3, stage:'pre_qual', status:'conditional', priority:'normal', value:42000, deadline:'2024-04-01', requester:'Dian Prakoso', notes:'Pre-qual passed but TKDN documentation incomplete. Conditional pending document submission.', submittedAt:'2024-03-10', resolvedAt:'2024-03-22', votes:{ approve:['Ahmad F.'], reject:[], conditional:['Siti R.','Budi S.'], abstain:[] } },
+    { id:'APR-004', vendorId:4, stage:'legal', status:'pending', priority:'urgent', value:310000, deadline:'2024-04-10', requester:'Ahmad Fauzi', notes:'Legal review in progress. Foreign ownership requires additional regulatory clearance.', submittedAt:'2024-03-20', resolvedAt:null, votes:{ approve:[], reject:[], conditional:[], abstain:[] } },
+    { id:'APR-005', vendorId:5, stage:'contract', status:'pending', priority:'critical', value:480000, deadline:'2024-04-05', requester:'Rina Wijaya', notes:'Final contract negotiation stage. Highest performer across all dimensions.', submittedAt:'2024-03-22', resolvedAt:null, votes:{ approve:['Ahmad F.'], reject:[], conditional:[], abstain:[] } },
+    { id:'APR-006', vendorId:3, stage:'commercial', status:'rejected', priority:'normal', value:42000, deadline:'2024-03-30', requester:'Budi Santoso', notes:'Pricing 35% above market benchmark. Rejected pending re-submission with revised pricing.', submittedAt:'2024-03-12', resolvedAt:'2024-03-25', votes:{ approve:[], reject:['Ahmad F.','Siti R.','Budi S.'], conditional:[], abstain:[] } },
+  ],
+  nextApprovalId: 7,
+
+  // Audit trail
+  auditLog: [
+    { type:'approved', action:'APR-002 approved for Award stage', actor:'Tender Board', time:'2024-03-18 14:30' },
+    { type:'submitted', action:'APR-005 submitted for Contract Execution', actor:'Rina Wijaya', time:'2024-03-22 09:15' },
+    { type:'submitted', action:'APR-004 submitted for Legal & Compliance', actor:'Ahmad Fauzi', time:'2024-03-20 11:00' },
+    { type:'conditional', action:'APR-003 conditionally approved — TKDN docs required', actor:'Procurement Committee', time:'2024-03-22 16:45' },
+    { type:'rejected', action:'APR-006 rejected — pricing uncompetitive', actor:'Tender Board', time:'2024-03-25 10:20' },
+    { type:'system', action:'Vendor Epsilon Digital registered to AVL', actor:'System', time:'2024-03-22 09:20' },
+    { type:'approved', action:'APR-001 approved for Technical Evaluation', actor:'Procurement Manager', time:'2024-03-10 13:00' },
+    { type:'system', action:'QCDSME evaluation scores updated for 5 vendors', actor:'System', time:'2024-03-08 17:00' },
+  ],
+};
+
+// Init with sample scores
+function initSampleData() {
+  const sampleScores = {
+    1: {Q1:4,Q2:3,Q3:4,Q4:3,Q5:4,Q6:3,Q7:3,Q8:2,Q9:4,Q10:3,Q11:3,Q12:4,Q13:3,Q14:3,Q15:4,Q16:3,Q17:4,Q18:3,Q19:2,Q20:3},
+    2: {Q1:3,Q2:4,Q3:3,Q4:4,Q5:3,Q6:4,Q7:2,Q8:3,Q9:3,Q10:4,Q11:3,Q12:3,Q13:4,Q14:3,Q15:3,Q16:4,Q17:3,Q18:2,Q19:3,Q20:2},
+    3: {Q1:2,Q2:3,Q3:2,Q4:2,Q5:3,Q6:2,Q7:4,Q8:4,Q9:2,Q10:3,Q11:2,Q12:2,Q13:3,Q14:2,Q15:2,Q16:2,Q17:2,Q18:4,Q19:4,Q20:3},
+    4: {Q1:3,Q2:2,Q3:3,Q4:3,Q5:2,Q6:3,Q7:2,Q8:2,Q9:3,Q10:2,Q11:3,Q12:3,Q13:2,Q14:3,Q15:3,Q16:3,Q17:2,Q18:2,Q19:2,Q20:2},
+    5: {Q1:4,Q2:4,Q3:4,Q4:4,Q5:3,Q6:4,Q7:3,Q8:3,Q9:3,Q10:3,Q11:4,Q12:3,Q13:3,Q14:4,Q15:3,Q16:3,Q17:3,Q18:3,Q19:3,Q20:3},
+  };
+  const samplePrices = {
+    1: {'Price of Goods / Services':45000,'Material':8000,'Labour / Hourly Rate':12000,'Overheads':3000,'Packaging':500,'Profit':4500,'Delivery':1200,'Installation':2500,'Training':3000,'Travel':800,'Maintenance':5000,'Spares':1500,'Energy / Fuel Consumption':2000,'Upgrade Costs':3000,'Consumables':1200,'Disposal / Exit Costs':500,'Less Residual Value':0},
+    2: {'Price of Goods / Services':42000,'Material':7500,'Labour / Hourly Rate':11000,'Overheads':2800,'Packaging':400,'Profit':4200,'Delivery':1000,'Installation':2200,'Training':2800,'Travel':600,'Maintenance':4800,'Spares':1200,'Energy / Fuel Consumption':1800,'Upgrade Costs':2800,'Consumables':1000,'Disposal / Exit Costs':400,'Less Residual Value':0},
+    3: {'Price of Goods / Services':38000,'Material':6500,'Labour / Hourly Rate':9500,'Overheads':2500,'Packaging':350,'Profit':3800,'Delivery':800,'Installation':2000,'Training':2500,'Travel':500,'Maintenance':4000,'Spares':1000,'Energy / Fuel Consumption':1600,'Upgrade Costs':2500,'Consumables':900,'Disposal / Exit Costs':350,'Less Residual Value':0},
+    4: {'Price of Goods / Services':55000,'Material':10000,'Labour / Hourly Rate':14000,'Overheads':4000,'Packaging':600,'Profit':5500,'Delivery':1500,'Installation':3000,'Training':3500,'Travel':1000,'Maintenance':6000,'Spares':2000,'Energy / Fuel Consumption':2500,'Upgrade Costs':3500,'Consumables':1500,'Disposal / Exit Costs':600,'Less Residual Value':0},
+    5: {'Price of Goods / Services':48000,'Material':8500,'Labour / Hourly Rate':12500,'Overheads':3200,'Packaging':550,'Profit':4800,'Delivery':1300,'Installation':2700,'Training':3200,'Travel':850,'Maintenance':5200,'Spares':1600,'Energy / Fuel Consumption':2100,'Upgrade Costs':3100,'Consumables':1300,'Disposal / Exit Costs':550,'Less Residual Value':0},
+  };
+  state.scores = sampleScores;
+  state.prices = samplePrices;
+  // QCDSME sample scores [vendorId][dimId] = 1-5
+  state.qcdsme.scores = {
+    1: { Q:4, C:3, D:4, S:4, M:4, E:3 },
+    2: { Q:5, C:3, D:4, S:4, M:4, E:4 },
+    3: { Q:3, C:5, D:3, S:3, M:3, E:4 },
+    4: { Q:3, C:2, D:3, S:3, M:3, E:3 },
+    5: { Q:4, C:4, D:5, S:4, M:5, E:4 },
+  };
+}
+initSampleData();
+
+// ============================================================
+// CALCULATIONS
+// ============================================================
+function getTotalPrice(vendorId) {
+  const p = state.prices[vendorId] || {};
+  return Object.values(p).reduce((a,b)=>a+b,0);
+}
+function getLowestPrice() {
+  return Math.min(...state.vendors.map(v => getTotalPrice(v.id)));
+}
+function getPriceScore(vendorId) {
+  const lowest = getLowestPrice();
+  if (lowest === 0) return 0;
+  return (lowest / getTotalPrice(vendorId)) * 100;
+}
+function getSectionScore(vendorId, section) {
+  const qs = section.questions;
+  if (!qs.length) return 0;
+  const total = qs.reduce((acc, q) => acc + ((state.scores[vendorId]||{})[q.id]||0), 0);
+  return (total / (qs.length * 4)) * 100;
+}
+function getOverallQualityScore(vendorId) {
+  let total = 0;
+  state.qualitySections.forEach(s => {
+    total += (getSectionScore(vendorId, s) * s.weight) / 100;
+  });
+  return total;
+}
+function getOverallScore(vendorId) {
+  const q = getOverallQualityScore(vendorId);
+  const p = getPriceScore(vendorId);
+  return (q * state.qualityWeight / 100) + (p * state.priceWeight / 100);
+}
+function getRankedVendors() {
+  return [...state.vendors].sort((a,b) => getOverallScore(b.id) - getOverallScore(a.id));
+}
+function getScorePillClass(score, maxScore=4) {
+  const pct = (score / maxScore) * 100;
+  if (pct >= 87.5) return 'score-ex';
+  if (pct >= 62.5) return 'score-good';
+  if (pct >= 37.5) return 'score-acc';
+  return 'score-poor';
+}
+function scoreLabel(score) {
+  if (score === 4) return 'Excellent';
+  if (score === 3) return 'Good';
+  if (score === 2) return 'Acceptable';
+  if (score === 1) return 'Poor';
+  return 'Unacceptable';
+}
+function fmt(n) { return Math.round(n*10)/10; }
+
+// ============================================================
+// RENDER OVERVIEW
+// ============================================================
+function renderOverview() {
+  const ranked = getRankedVendors();
+  document.getElementById('stat-vendors').textContent = state.vendors.length;
+  document.getElementById('stat-criteria').textContent = state.qualitySections.length;
+  document.getElementById('stat-q-weight').textContent = state.qualityWeight + '%';
+  document.getElementById('stat-top-vendor').textContent = ranked.length ? ranked[0].name.split(' ')[0] : '—';
+  document.getElementById('proj-q-weight').textContent = state.qualityWeight + '%';
+  document.getElementById('proj-p-weight').textContent = state.priceWeight + '%';
+
+  // Rankings
+  const rc = document.getElementById('rankings-container');
+  rc.innerHTML = '';
+  ranked.forEach((v,i) => {
+    const score = getOverallScore(v.id);
+    const pct = (score / 100) * 100;
+    const bgClass = i===0?'rank-1-bg':i===1?'rank-2-bg':i===2?'rank-3-bg':'rank-other';
+    const riskColor = {'low':'var(--green-600)','medium':'var(--amber-600)','high':'var(--red-600)'};
+    const riskBg = {'low':'var(--green-100)','medium':'var(--amber-100)','high':'var(--red-100)'};
+    const overallRisk = (v.riskSupplyChain==='high'||v.riskDependency==='high'||v.riskGeo==='high'||v.blacklisted==='yes') ? 'high'
+      : (v.riskSupplyChain==='medium'||v.riskDependency==='medium'||v.riskGeo==='medium') ? 'medium' : 'low';
+    rc.innerHTML += `<div class="rank-row">
+      <div class="rank-num ${bgClass}">${i+1}</div>
+      <div class="rank-name" style="flex:1">
+        <div style="font-weight:600;font-size:13px">${v.name}</div>
+        <div style="font-size:11px;color:var(--slate-400);margin-top:1px">${v.country||''}${v.category?' · '+v.category.split('/')[0].trim():''}</div>
+      </div>
+      <span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;background:${riskBg[overallRisk]};color:${riskColor[overallRisk]};margin-right:8px;white-space:nowrap">${overallRisk.toUpperCase()}</span>
+      <div class="rank-bar-wrap">
+        <div class="rank-bar"><div class="rank-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="rank-score">${fmt(score)}%</div>
+    </div>`;
+  });
+
+  renderRadar();
+}
+
+// ============================================================
+// RADAR CHART
+// ============================================================
+function renderRadar() {
+  const svg = document.getElementById('radar-svg');
+  const legend = document.getElementById('radar-legend');
+  const sections = state.qualitySections;
+  const cx = 200, cy = 160, r = 110;
+  const n = sections.length;
+  const levels = 4;
+
+  let html = '';
+  // Grid
+  for (let l = 1; l <= levels; l++) {
+    const fr = (r * l) / levels;
+    const pts = sections.map((_,i)=> {
+      const a = (2*Math.PI*i/n) - Math.PI/2;
+      return `${cx+fr*Math.cos(a)},${cy+fr*Math.sin(a)}`;
+    }).join(' ');
+    html += `<polygon points="${pts}" fill="none" stroke="#DBEAFE" stroke-width="1"/>`;
+  }
+  // Axes
+  sections.forEach((_,i) => {
+    const a = (2*Math.PI*i/n) - Math.PI/2;
+    html += `<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(a)}" y2="${cy+r*Math.sin(a)}" stroke="#BFDBFE" stroke-width="1"/>`;
+  });
+  // Labels
+  sections.forEach((s,i) => {
+    const a = (2*Math.PI*i/n) - Math.PI/2;
+    const lx = cx + (r+22)*Math.cos(a), ly = cy + (r+22)*Math.sin(a);
+    const anchor = Math.cos(a) > 0.3 ? 'start' : Math.cos(a) < -0.3 ? 'end' : 'middle';
+    html += `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" font-size="10" fill="#475569" font-weight="500">${s.name}</text>`;
+  });
+
+  // Vendor polygons
+  state.vendors.forEach((v,vi) => {
+    const col = COLORS[vi % COLORS.length];
+    const pts = sections.map((s,i) => {
+      const score = getSectionScore(v.id, s);
+      const fr = (r * score) / 100;
+      const a = (2*Math.PI*i/n) - Math.PI/2;
+      return `${cx+fr*Math.cos(a)},${cy+fr*Math.sin(a)}`;
+    }).join(' ');
+    html += `<polygon points="${pts}" fill="${col}" fill-opacity="0.12" stroke="${col}" stroke-width="1.5" stroke-linejoin="round"/>`;
+  });
+  svg.innerHTML = html;
+
+  // Legend
+  legend.innerHTML = state.vendors.map((v,i) =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${COLORS[i%COLORS.length]}"></div>${v.name.split(' ')[0]}</div>`
+  ).join('');
+}
+
+// ============================================================
+// RENDER QUALITY TABLE
+// ============================================================
+function renderQualityTable() {
+  const thead = document.getElementById('quality-thead');
+  const tbody = document.getElementById('quality-tbody');
+
+  const vhdrs = state.vendors.map(v => `<th style="text-align:center;min-width:90px">${v.name.split(' ')[0]}</th>`).join('');
+  thead.innerHTML = `<tr>
+    <th width="36"></th>
+    <th>Section / Question</th>
+    <th width="90">Weight %</th>
+    ${vhdrs}
+  </tr>`;
+
+  let rows = '';
+  state.qualitySections.forEach(sec => {
+    rows += `<tr class="section-row">
+      <td></td>
+      <td>${sec.name} <span class="section-weight-label">${sec.weight}%</span></td>
+      <td></td>
+      ${state.vendors.map(v => {
+        const ss = getSectionScore(v.id, sec);
+        return `<td style="text-align:center"><span class="score-pill ${getScorePillClass(ss,100)}">${fmt(ss)}%</span></td>`;
+      }).join('')}
+    </tr>`;
+    sec.questions.forEach(q => {
+      const vCells = state.vendors.map(v => {
+        const sc = (state.scores[v.id]||{})[q.id]||0;
+        return `<td style="text-align:center">
+          <input type="number" min="0" max="4" value="${sc}" class="score-input"
+            oninput="setScore(${v.id},'${q.id}',this.value)"
+            title="${scoreLabel(sc)}">
+        </td>`;
+      }).join('');
+      rows += `<tr>
+        <td style="color:var(--slate-400);font-size:11px;font-family:'DM Mono',monospace">${q.id}</td>
+        <td style="color:var(--slate-600)">${q.text}</td>
+        <td></td>
+        ${vCells}
+      </tr>`;
+    });
+  });
+
+  // Totals row
+  rows += `<tr style="background:var(--blue-50)">
+    <td></td>
+    <td style="font-weight:700;color:var(--blue-800)">Overall Quality Score</td>
+    <td></td>
+    ${state.vendors.map(v => {
+      const qs = getOverallQualityScore(v.id);
+      return `<td style="text-align:center"><strong style="color:var(--blue-700);font-family:'DM Mono',monospace">${fmt(qs)}%</strong></td>`;
+    }).join('')}
+  </tr>`;
+
+  tbody.innerHTML = rows;
+
+  // Section summary
+  const sumEl = document.getElementById('quality-section-summary');
+  sumEl.innerHTML = state.qualitySections.map(sec => {
+    return `<div style="padding:14px;border:1px solid var(--blue-100);border-radius:10px">
+      <div style="font-weight:600;font-size:13px;color:var(--slate-800);margin-bottom:10px">${sec.name} <span class="section-weight-label">${sec.weight}%</span></div>
+      ${state.vendors.map(v => {
+        const ss = getSectionScore(v.id, sec);
+        return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:12px;color:var(--slate-600);flex:1">${v.name.split(' ')[0]}</span>
+          <div style="flex:2;height:6px;background:var(--slate-100);border-radius:3px;overflow:hidden">
+            <div style="width:${ss}%;height:100%;background:linear-gradient(90deg,var(--blue-400),var(--blue-600));border-radius:3px;transition:width 0.4s"></div>
+          </div>
+          <span style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--blue-700);width:42px;text-align:right">${fmt(ss)}%</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// RENDER PRICE TABLE
+// ============================================================
+function renderPriceTable() {
+  const vhdrs = state.vendors.map(v => `<th>${v.name.split(' ')[0]}</th>`).join('');
+  document.getElementById('price-thead').innerHTML = `<tr>
+    <th>Cost Category</th>
+    ${vhdrs}
+  </tr>`;
+
+  let rows = '';
+  state.priceSections.forEach(sec => {
+    rows += `<tr class="section-row"><td colspan="${state.vendors.length+1}">${sec.name}</td></tr>`;
+    sec.items.forEach(item => {
+      const vCells = state.vendors.map(v => {
+        const val = (state.prices[v.id]||{})[item]||0;
+        return `<td><input type="number" min="0" value="${val}" class="cost-input" oninput="setPrice(${v.id},'${item}',this.value)"></td>`;
+      }).join('');
+      rows += `<tr><td style="color:var(--slate-600);padding-left:24px">${item}</td>${vCells}</tr>`;
+    });
+    // Section subtotal
+    rows += `<tr style="background:var(--blue-50)">
+      <td style="font-weight:600;padding-left:24px;color:var(--blue-800)">Section Total</td>
+      ${state.vendors.map(v => {
+        const p = state.prices[v.id]||{};
+        const total = sec.items.reduce((a,it)=>a+(p[it]||0),0);
+        return `<td style="font-family:'DM Mono',monospace;font-weight:600;color:var(--blue-700)">${total.toLocaleString()}</td>`;
+      }).join('')}
+    </tr>`;
+  });
+
+  // Grand total
+  rows += `<tr style="background:var(--blue-700)">
+    <td style="font-weight:700;color:white">TOTAL PRICE</td>
+    ${state.vendors.map(v => {
+      const tot = getTotalPrice(v.id);
+      return `<td style="font-family:'DM Mono',monospace;font-weight:700;color:white">${tot.toLocaleString()}</td>`;
+    }).join('')}
+  </tr>`;
+
+  document.getElementById('price-tbody').innerHTML = rows;
+}
+
+// ============================================================
+// RENDER COMBINED
+// ============================================================
+function renderCombined() {
+  const ranked = getRankedVendors();
+  const lowest = getLowestPrice();
+
+  let html = `<thead><tr>
+    <th>Rank</th>
+    <th>Vendor</th>
+    <th>Quality Score</th>
+    <th>Price (Total)</th>
+    <th>Price Score</th>
+    <th>Weighted Quality</th>
+    <th>Weighted Price</th>
+    <th>Overall Score</th>
+    <th>Threshold</th>
+  </tr></thead><tbody>`;
+
+  ranked.forEach((v,i) => {
+    const qs = getOverallQualityScore(v.id);
+    const ps = getPriceScore(v.id);
+    const wq = (qs * state.qualityWeight) / 100;
+    const wp = (ps * state.priceWeight) / 100;
+    const os = wq + wp;
+    const thresholdPass = qs >= state.overallThreshold;
+    const rankClass = i===0?'rank-1-bg':i===1?'rank-2-bg':i===2?'rank-3-bg':'rank-other';
+    html += `<tr>
+      <td><span class="rank-num ${rankClass}" style="width:24px;height:24px;font-size:11px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-weight:700">${i+1}</span></td>
+      <td style="font-weight:500">${v.name}</td>
+      <td><span class="score-pill ${getScorePillClass(qs,100)}">${fmt(qs)}%</span></td>
+      <td style="font-family:'DM Mono',monospace">${getTotalPrice(v.id).toLocaleString()}</td>
+      <td style="font-family:'DM Mono',monospace">${fmt(ps)}%</td>
+      <td style="font-family:'DM Mono',monospace;color:var(--blue-600)">${fmt(wq)}%</td>
+      <td style="font-family:'DM Mono',monospace;color:var(--blue-600)">${fmt(wp)}%</td>
+      <td><strong style="font-family:'DM Mono',monospace;font-size:15px;color:var(--blue-800)">${fmt(os)}%</strong></td>
+      <td><span class="threshold-badge ${thresholdPass?'threshold-pass':'threshold-fail'}">${thresholdPass?'✓ Pass':'✗ Fail'}</span></td>
+    </tr>`;
+  });
+  html += '</tbody>';
+  document.getElementById('combined-table').innerHTML = html;
+
+  renderBarChart(ranked);
+}
+
+// ============================================================
+// BAR CHART
+// ============================================================
+function renderBarChart(ranked) {
+  const svg = document.getElementById('bar-chart-svg');
+  const W = 800, H = 280;
+  const pad = { l:50, r:20, t:30, b:60 };
+  const chartW = W - pad.l - pad.r;
+  const chartH = H - pad.t - pad.b;
+  const bw = Math.min(60, (chartW / ranked.length) * 0.6);
+  const gap = chartW / ranked.length;
+
+  let html = '';
+  // Y axis lines
+  for (let i = 0; i <= 5; i++) {
+    const y = pad.t + chartH - (chartH * i / 5);
+    const val = i * 20;
+    html += `<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" stroke="#E2E8F0" stroke-width="1"/>`;
+    html += `<text x="${pad.l-8}" y="${y}" text-anchor="end" dominant-baseline="middle" font-size="10" fill="#94A3B8">${val}%</text>`;
+  }
+
+  ranked.forEach((v,i) => {
+    const qs = getOverallQualityScore(v.id);
+    const ps = getPriceScore(v.id);
+    const wq = (qs * state.qualityWeight) / 100;
+    const wp = (ps * state.priceWeight) / 100;
+    const os = wq + wp;
+
+    const x = pad.l + gap * i + gap / 2;
+    const hQ = (wq / 100) * chartH;
+    const hP = (wp / 100) * chartH;
+
+    // Quality bar
+    html += `<rect x="${x - bw}" y="${pad.t + chartH - hQ - hP}" width="${bw * 0.9}" height="${hQ}" rx="3" fill="url(#gQ)" opacity="0.85"/>`;
+    // Price bar
+    html += `<rect x="${x - bw}" y="${pad.t + chartH - hP}" width="${bw * 0.9}" height="${hP}" rx="3" fill="url(#gP)" opacity="0.85"/>`;
+
+    // Total label
+    html += `<text x="${x - bw/2 + bw*0.45}" y="${pad.t + chartH - hQ - hP - 7}" text-anchor="middle" font-size="11" fill="#1D4ED8" font-weight="600">${fmt(os)}%</text>`;
+
+    // Vendor label
+    const shortName = v.name.split(' ').slice(0,2).join(' ');
+    html += `<text x="${x - bw/2 + bw*0.45}" y="${pad.t + chartH + 16}" text-anchor="middle" font-size="10" fill="#64748B">${shortName}</text>`;
+  });
+
+  // Legend
+  html += `<rect x="${pad.l}" y="${H-18}" width="10" height="10" rx="2" fill="#60A5FA"/>`;
+  html += `<text x="${pad.l+14}" y="${H-10}" font-size="10" fill="#64748B">Quality (weighted)</text>`;
+  html += `<rect x="${pad.l+130}" y="${H-18}" width="10" height="10" rx="2" fill="#93C5FD"/>`;
+  html += `<text x="${pad.l+144}" y="${H-10}" font-size="10" fill="#64748B">Price (weighted)</text>`;
+
+  // Gradients
+  html = `<defs>
+    <linearGradient id="gQ" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2563EB"/><stop offset="1" stop-color="#60A5FA"/></linearGradient>
+    <linearGradient id="gP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#93C5FD"/><stop offset="1" stop-color="#BFDBFE"/></linearGradient>
+  </defs>` + html;
+
+  svg.innerHTML = html;
+}
+
+// ============================================================
+// RENDER SETTINGS
+// ============================================================
+function renderSettings() {
+  // Slider
+  document.getElementById('quality-weight-slider').value = state.qualityWeight;
+  document.getElementById('q-weight-pct').textContent = state.qualityWeight + '%';
+  document.getElementById('p-weight-pct').textContent = state.priceWeight + '%';
+  document.getElementById('overall-threshold').value = state.overallThreshold;
+
+  // Section weights
+  const swl = document.getElementById('section-weights-list');
+  swl.innerHTML = state.qualitySections.map(sec => `
+    <div class="weighting-row">
+      <div class="weighting-label"><strong>${sec.name}</strong>
+        <span style="font-size:11px;color:var(--slate-500);margin-left:8px">${sec.questions.length} questions</span>
+      </div>
+      <div class="weighting-slider">
+        <input type="range" min="0" max="100" value="${sec.weight}" oninput="setSectionWeight('${sec.id}',this.value)">
+      </div>
+      <div class="weighting-pct" id="sw-${sec.id}">${sec.weight}%</div>
+    </div>
+  `).join('');
+  updateSectionTotal();
+
+  // Threshold list
+  const tsl = document.getElementById('threshold-section-list');
+  tsl.innerHTML = state.qualitySections.map(sec => `
+    <div class="weighting-row">
+      <div class="weighting-label">${sec.name} Threshold</div>
+      <input type="number" min="0" max="100" value="${sec.threshold}" class="weight-input" oninput="setSectionThreshold('${sec.id}',this.value)">
+      <span style="font-size:12px;color:var(--slate-500)">%</span>
+    </div>
+  `).join('');
+
+  // Vendors
+  const vg = document.getElementById('vendors-grid-manage');
+  const riskColor = {'low':'var(--green-600)','medium':'var(--amber-600)','high':'var(--red-600)'};
+  const riskBg = {'low':'var(--green-100)','medium':'var(--amber-100)','high':'var(--red-100)'};
+  vg.innerHTML = state.vendors.map((v,i) => {
+    const os = getOverallScore(v.id);
+    const ranked = getRankedVendors();
+    const rank = ranked.findIndex(r=>r.id===v.id)+1;
+    const certs = (v.certifications||[]).slice(0,3);
+    const stars = '★'.repeat(v.starRating||0) + '☆'.repeat(5-(v.starRating||0));
+    const overallRisk = ['low','low','medium'].includes(v.riskSupplyChain) &&
+      v.blacklisted !== 'yes' ? (v.riskSupplyChain==='high'||v.riskDependency==='high'||v.riskGeo==='high'?'medium':'low') : 'high';
+    return `<div class="vendor-card${rank===1?' top':''}" style="min-width:0">
+      <div class="vendor-rank rank-${rank}">${rank}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-right:28px">
+        <div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,${['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6'][i%5]},${['#60A5FA','#34D399','#FBBF24','#F87171','#A78BFA'][i%5]});display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:13px;flex-shrink:0">${v.name.charAt(0)}</div>
+        <div>
+          <input class="vendor-name-input" type="text" value="${v.name}" oninput="renameVendor(${v.id},this.value)" style="font-size:13px">
+          <div style="font-size:11px;color:var(--slate-400)">${v.country||''}${v.yearEstablished?' · Est. '+v.yearEstablished:''}</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--slate-500);margin-bottom:8px">${v.category||'Category not set'}</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+        <span style="font-size:12px;color:#F59E0B">${stars}</span>
+        <span style="font-size:10px;color:var(--slate-400)">(${['Not rated','Poor','Fair','Good','Very Good','Excellent'][v.starRating||0]})</span>
+      </div>
+      <div style="margin-bottom:8px">
+        ${certs.map(c=>`<span class="vendor-detail-badge">${c}</span>`).join('')}
+        ${(v.certifications||[]).length>3?`<span class="vendor-detail-badge">+${v.certifications.length-3}</span>`:''}
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+        <span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;background:${riskBg[overallRisk]};color:${riskColor[overallRisk]}">Risk: ${overallRisk.toUpperCase()}</span>
+        ${v.blacklisted==='yes'?'<span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;background:var(--red-100);color:var(--red-600)">⚠ BLACKLISTED</span>':''}
+        ${v.taxStatus?.includes('Compliant')?'<span style="font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;background:var(--green-100);color:var(--green-600)">✓ Tax OK</span>':''}
+      </div>
+      <div class="vendor-score-row">
+        <span class="vendor-score-label">Overall Score</span>
+        <span class="vendor-score-val">${fmt(os)}%</span>
+      </div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:${os}%"></div></div>
+      ${v.notes?`<div style="margin-top:8px;font-size:11px;color:var(--slate-500);font-style:italic;border-top:1px solid var(--slate-100);padding-top:6px">"${v.notes.substring(0,80)}${v.notes.length>80?'…':''}"</div>`:''}
+    </div>`;
+  }).join('') + `<div class="add-vendor-btn" onclick="openAddVendorModal()">+ Register New Vendor</div>`;
+}
+
+// ============================================================
+// STATE MUTATIONS
+// ============================================================
+function setScore(vendorId, qId, val) {
+  if (!state.scores[vendorId]) state.scores[vendorId] = {};
+  state.scores[vendorId][qId] = Math.max(0, Math.min(4, parseInt(val)||0));
+  recalcAll();
+}
+function setPrice(vendorId, item, val) {
+  if (!state.prices[vendorId]) state.prices[vendorId] = {};
+  state.prices[vendorId][item] = parseFloat(val)||0;
+  recalcAll();
+}
+function updateWeights(val) {
+  state.qualityWeight = parseInt(val);
+  state.priceWeight = 100 - state.qualityWeight;
+  document.getElementById('q-weight-pct').textContent = state.qualityWeight + '%';
+  document.getElementById('p-weight-pct').textContent = state.priceWeight + '%';
+  document.getElementById('price-weight-slider').value = state.priceWeight;
+  recalcAll();
+}
+function setSectionWeight(secId, val) {
+  const sec = state.qualitySections.find(s=>s.id===secId);
+  if (sec) { sec.weight = parseInt(val)||0; document.getElementById('sw-'+secId).textContent = val+'%'; }
+  updateSectionTotal();
+  recalcAll();
+}
+function setSectionThreshold(secId, val) {
+  const sec = state.qualitySections.find(s=>s.id===secId);
+  if (sec) sec.threshold = parseInt(val)||0;
+}
+function updateSectionTotal() {
+  const total = state.qualitySections.reduce((a,s)=>a+s.weight,0);
+  const el = document.getElementById('section-total-indicator');
+  if (el) {
+    el.textContent = `Total: ${total}%`;
+    el.className = 'total-indicator ' + (total===100?'total-ok':'total-warn');
+  }
+}
+function renameVendor(id, name) {
+  const v = state.vendors.find(v=>v.id===id);
+  if (v) v.name = name;
+  recalcAll();
+}
+function updateProjectTitle(val) {
+  state.projectTitle = val;
+  document.getElementById('display-project-title').textContent = val + ' — Vendor Evaluation';
+}
+function updateCategory(val) {
+  const defaults = { strategic:40, routine:20, leverage:30, bottleneck:70 };
+  state.qualityWeight = defaults[val]||40;
+  state.priceWeight = 100-state.qualityWeight;
+  document.getElementById('quality-weight-slider').value = state.qualityWeight;
+  updateWeights(state.qualityWeight);
+  showToast(`Weights updated for ${val} procurement`);
+}
+
+// ============================================================
+// MASTER RECALC
+// ============================================================
+function recalcAll() {
+  const activeTab = document.querySelector('.tab.active')?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
+  if (activeTab === 'overview') renderOverview();
+  else if (activeTab === 'qcdsme') renderQCDSME();
+  else if (activeTab === 'quality') renderQualityTable();
+  else if (activeTab === 'price') renderPriceTable();
+  else if (activeTab === 'combined') renderCombined();
+  else if (activeTab === 'approval') renderApproval();
+  else if (activeTab === 'settings') renderSettings();
+  renderOverview();
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('page-'+tab).classList.add('active');
+  if (tab==='overview') renderOverview();
+  else if (tab==='qcdsme') renderQCDSME();
+  else if (tab==='quality') renderQualityTable();
+  else if (tab==='price') renderPriceTable();
+  else if (tab==='combined') renderCombined();
+  else if (tab==='approval') renderApproval();
+  else if (tab==='settings') renderSettings();
+}
+
+// ============================================================
+// MULTI-STEP WIZARD LOGIC
+// ============================================================
+let wizCurrentStep = 1;
+const WIZ_TOTAL = 5;
+let wizStarRating = 0;
+let wizBlacklist = 'no';
+let wizRisks = { sc:'low', dep:'low', geo:'low', tech:'low' };
+
+function openAddVendorModal() {
+  wizCurrentStep = 1;
+  wizStarRating = 0;
+  wizBlacklist = 'no';
+  wizRisks = { sc:'low', dep:'low', geo:'low', tech:'low' };
+  // Reset all inputs
+  document.querySelectorAll('.wiz-page input, .wiz-page select, .wiz-page textarea').forEach(el => {
+    if (el.type === 'checkbox') el.checked = false;
+    else el.value = '';
+  });
+  document.querySelectorAll('.wf-checkbox-item').forEach(el => el.classList.remove('checked'));
+  setStars(0);
+  setBlacklist('no');
+  ['sc','dep','geo','tech'].forEach(k => setRisk(k,'low'));
+  renderWizStep();
+  document.getElementById('add-vendor-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('v-name').focus(), 80);
+}
+
+function closeModal() {
+  document.getElementById('add-vendor-modal').classList.remove('open');
+}
+
+function renderWizStep() {
+  // Pages
+  for (let i=1; i<=WIZ_TOTAL; i++) {
+    document.getElementById(`wstep-${i}`).classList.toggle('active', i===wizCurrentStep);
+    const tab = document.getElementById(`stab-${i}`);
+    tab.classList.remove('active','done');
+    if (i === wizCurrentStep) tab.classList.add('active');
+    else if (i < wizCurrentStep) tab.classList.add('done');
+  }
+  // Progress bar
+  document.getElementById('wiz-progress').style.width = (wizCurrentStep/WIZ_TOTAL*100)+'%';
+  // Footer
+  document.getElementById('wiz-step-counter').textContent = `Step ${wizCurrentStep} of ${WIZ_TOTAL}`;
+  document.getElementById('wiz-back-btn').style.display = wizCurrentStep>1 ? 'inline-block' : 'none';
+  const nextBtn = document.getElementById('wiz-next-btn');
+  nextBtn.textContent = wizCurrentStep === WIZ_TOTAL ? '✓ Register Vendor' : 'Next →';
+  nextBtn.style.background = wizCurrentStep === WIZ_TOTAL
+    ? 'linear-gradient(135deg,#16A34A,#22C55E)'
+    : '';
+}
+
+function wizNext() {
+  if (wizCurrentStep === 1) {
+    const name = document.getElementById('v-name').value.trim();
+    const contact = document.getElementById('v-contact').value.trim();
+    const email = document.getElementById('v-email').value.trim();
+    if (!name) { flashError('v-name','Company name is required'); return; }
+    if (!contact) { flashError('v-contact','Contact person name is required'); return; }
+    if (!email) { flashError('v-email','Email is required'); return; }
+  }
+  if (wizCurrentStep < WIZ_TOTAL) {
+    wizCurrentStep++;
+    renderWizStep();
+    document.querySelector('.wiz-body').scrollTop = 0;
+  } else {
+    addVendor();
+  }
+}
+
+function wizBack() {
+  if (wizCurrentStep > 1) {
+    wizCurrentStep--;
+    renderWizStep();
+    document.querySelector('.wiz-body').scrollTop = 0;
+  }
+}
+
+function flashError(id, msg) {
+  const el = document.getElementById(id);
+  el.classList.add('error');
+  el.focus();
+  el.placeholder = msg;
+  setTimeout(()=>{ el.classList.remove('error'); }, 2000);
+}
+
+function toggleCheck(label) {
+  label.classList.toggle('checked');
+}
+
+function setStars(n) {
+  wizStarRating = n;
+  const stars = document.querySelectorAll('.wf-star');
+  stars.forEach((s,i) => s.classList.toggle('lit', i < n));
+  const labels = ['Not rated','Poor','Below Average','Average','Good','Excellent'];
+  document.getElementById('star-label').textContent = labels[n] || 'Not rated';
+}
+
+function setBlacklist(val) {
+  wizBlacklist = val;
+  ['no','yes','unknown'].forEach(v => {
+    const el = document.getElementById(`blacklist-${v}`);
+    if (el) el.classList.toggle('selected', v===val);
+  });
+}
+
+function setRisk(type, level) {
+  wizRisks[type] = level;
+  ['low','medium','high'].forEach(l => {
+    const el = document.getElementById(`${type === 'sc' ? 'scr' : type}-${l}`);
+    if (el) el.classList.toggle('selected', l===level);
+  });
+}
+
+function getCheckedValues(groupId) {
+  const group = document.getElementById(groupId);
+  if (!group) return [];
+  return [...group.querySelectorAll('.wf-checkbox-item.checked input')].map(el => el.value);
+}
+
+function addVendor() {
+  const name = document.getElementById('v-name').value.trim() || 'New Vendor';
+  const vendor = {
+    id: state.nextVendorId++,
+    name,
+    brand: document.getElementById('v-brand').value.trim(),
+    code: document.getElementById('v-code').value.trim(),
+    regNo: document.getElementById('v-regno').value.trim(),
+    taxId: document.getElementById('v-tax').value.trim(),
+    country: document.getElementById('v-country').value,
+    yearEstablished: document.getElementById('v-year').value,
+    contact: document.getElementById('v-contact').value.trim(),
+    contactTitle: document.getElementById('v-title').value.trim(),
+    email: document.getElementById('v-email').value.trim(),
+    phone: document.getElementById('v-phone').value.trim(),
+    address: document.getElementById('v-address').value.trim(),
+    website: document.getElementById('v-web').value.trim(),
+    linkedin: document.getElementById('v-linkedin').value.trim(),
+    category: document.getElementById('v-category').value,
+    companySize: document.getElementById('v-size').value,
+    experience: document.getElementById('v-exp').value,
+    geoCoverage: document.getElementById('v-geo').value,
+    products: document.getElementById('v-products').value.trim(),
+    references: document.getElementById('v-clients').value.trim(),
+    certifications: [
+      ...getCheckedValues('cert-group'),
+      ...(document.getElementById('v-other-certs').value.split(',').map(s=>s.trim()).filter(Boolean))
+    ],
+    starRating: wizStarRating,
+    licenseStatus: document.getElementById('v-license').value,
+    taxStatus: document.getElementById('v-taxstatus').value,
+    blacklisted: wizBlacklist,
+    antiBribery: document.getElementById('v-antibrib').value,
+    gdpr: document.getElementById('v-gdpr').value,
+    tkdn: document.getElementById('v-tkdn').value,
+    ownership: document.getElementById('v-ownership').value,
+    legalDisputes: document.getElementById('v-legal').value.trim(),
+    esg: getCheckedValues('esg-group'),
+    turnover: document.getElementById('v-turnover').value,
+    growthTrend: document.getElementById('v-growth').value,
+    audited: document.getElementById('v-audited').value,
+    profitability: document.getElementById('v-profit').value,
+    debtLevel: document.getElementById('v-debt').value,
+    creditTerms: document.getElementById('v-credit').value,
+    insurance: getCheckedValues('ins-group'),
+    bankRef: document.getElementById('v-bank').value.trim(),
+    riskSupplyChain: wizRisks.sc,
+    riskDependency: wizRisks.dep,
+    riskGeo: wizRisks.geo,
+    riskTech: wizRisks.tech,
+    subcontracting: document.getElementById('v-subcon').value,
+    keyPerson: document.getElementById('v-keyperson').value,
+    sourcedVia: document.getElementById('v-source').value,
+    conflictOfInterest: document.getElementById('v-coi').value,
+    notes: document.getElementById('v-notes').value.trim(),
+    registeredAt: new Date().toLocaleDateString('en-GB'),
+  };
+  state.vendors.push(vendor);
+  closeModal();
+  recalcAll();
+  showToast(`✓ ${name} registered successfully`);
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+function printDashboard() { window.print(); }
+
+// ============================================================
+// QCDSME FUNCTIONS
+// ============================================================
+function getQCDSMEScore(vendorId) {
+  const dims = state.qcdsme.dims;
+  const scores = state.qcdsme.scores[vendorId] || {};
+  let total = 0;
+  dims.forEach(d => {
+    const s = scores[d.id] || 0;
+    total += (s / 5) * 100 * (d.weight / 100);
+  });
+  return total;
+}
+
+function renderQCDSME() {
+  const dims = state.qcdsme.dims;
+  const totalW = dims.reduce((a,d)=>a+d.weight,0);
+  const wtEl = document.getElementById('qcdsme-weight-total');
+  if (wtEl) { wtEl.textContent = 'Total: '+totalW+'%'; wtEl.className = 'font-size:12px;padding:3px 10px;border-radius:12px;font-weight:600;background:'+(totalW===100?'var(--green-100)':'var(--red-100)')+';color:'+(totalW===100?'var(--green-600)':'var(--red-600)'); }
+
+  // Weight sliders
+  const wsliders = document.getElementById('qcdsme-weight-sliders');
+  if (wsliders) {
+    wsliders.innerHTML = dims.map(d => `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:${d.bg};border:1px solid ${d.color}30">
+        <div style="width:28px;height:28px;border-radius:7px;background:${d.color};display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:14px;flex-shrink:0">${d.id}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700;color:var(--slate-700)">${d.label}</div>
+          <input type="range" min="0" max="50" value="${d.weight}" style="width:100%;accent-color:${d.color}" oninput="setQDimWeight('${d.id}',this.value)">
+        </div>
+        <div id="qw-${d.id}" style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:${d.color};width:36px;text-align:right">${d.weight}%</div>
+      </div>
+    `).join('');
+  }
+
+  // Scoring table
+  const qt = document.getElementById('qcdsme-table');
+  if (qt) {
+    const vhdrs = state.vendors.map(v=>`<th style="text-align:center;min-width:100px">${v.name.split(' ')[0]}</th>`).join('');
+    let html = `<thead><tr><th width="40"></th><th>Dimension</th><th width="60">Weight</th>${vhdrs}<th>Benchmark</th></tr></thead><tbody>`;
+    dims.forEach(d => {
+      const vCells = state.vendors.map(v => {
+        const sc = (state.qcdsme.scores[v.id]||{})[d.id]||0;
+        const pct = (sc/5)*100;
+        const color = sc>=4?'var(--green-600)':sc===3?'var(--blue-600)':sc===2?'var(--amber-600)':'var(--red-600)';
+        return `<td style="text-align:center">
+          <input type="number" min="1" max="5" value="${sc||''}" class="qscore-input" placeholder="1-5"
+            oninput="setQScore(${v.id},'${d.id}',this.value)">
+          <div style="height:3px;background:var(--slate-100);border-radius:2px;margin-top:4px;overflow:hidden">
+            <div style="width:${pct}%;height:100%;background:${color};border-radius:2px;transition:width 0.3s"></div>
+          </div>
+        </td>`;
+      }).join('');
+      const avgScore = state.vendors.reduce((a,v)=>a+((state.qcdsme.scores[v.id]||{})[d.id]||0),0)/state.vendors.length;
+      html += `<tr>
+        <td><div style="width:24px;height:24px;border-radius:6px;background:${d.color};display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:12px">${d.id}</div></td>
+        <td><div style="font-weight:600;font-size:13px">${d.label}</div><div style="font-size:11px;color:var(--slate-400)">${d.subtitle}</div></td>
+        <td style="text-align:center"><span style="background:${d.color}20;color:${d.color};padding:3px 8px;border-radius:10px;font-size:12px;font-weight:700">${d.weight}%</span></td>
+        ${vCells}
+        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--slate-500)">${fmt(avgScore)}/5</td>
+      </tr>`;
+    });
+    // Total row
+    const vTotals = state.vendors.map(v => {
+      const total = getQCDSMEScore(v.id);
+      return `<td style="text-align:center"><strong style="font-size:14px;color:var(--blue-700);font-family:'DM Mono',monospace">${fmt(total)}%</strong></td>`;
+    }).join('');
+    html += `<tr style="background:var(--blue-50)"><td></td><td style="font-weight:700;color:var(--blue-800)">QCDSME Composite Score</td><td></td>${vTotals}<td></td></tr>`;
+    html += '</tbody>';
+    qt.innerHTML = html;
+  }
+
+  // Radar
+  renderQCDSMERadar();
+
+  // Rankings
+  const ranked = [...state.vendors].sort((a,b)=>getQCDSMEScore(b.id)-getQCDSMEScore(a.id));
+  const qr = document.getElementById('qcdsme-rankings');
+  if (qr) {
+    qr.innerHTML = ranked.map((v,i)=>{
+      const sc = getQCDSMEScore(v.id);
+      const bgClass = i===0?'rank-1-bg':i===1?'rank-2-bg':i===2?'rank-3-bg':'rank-other';
+      return `<div class="rank-row">
+        <div class="rank-num ${bgClass}">${i+1}</div>
+        <div class="rank-name" style="flex:1">
+          <div style="font-weight:600;font-size:13px">${v.name}</div>
+          <div style="font-size:11px;color:var(--slate-400);margin-top:1px">${dims.map(d=>`<span style="color:${d.color};font-weight:700">${d.id}</span>:${(state.qcdsme.scores[v.id]||{})[d.id]||0}`).join(' ')}</div>
+        </div>
+        <div class="rank-bar-wrap" style="width:90px">
+          <div class="rank-bar"><div class="rank-bar-fill" style="width:${sc}%"></div></div>
+        </div>
+        <div class="rank-score">${fmt(sc)}%</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Criteria reference cards
+  const ref = document.getElementById('qcdsme-criteria-ref');
+  if (ref) {
+    ref.innerHTML = dims.map(d => `
+      <div class="qcdsme-dim-card dim-${d.id}">
+        <div class="dim-letter" style="background:${d.color}">${d.id}</div>
+        <div class="dim-title">${d.label}</div>
+        <div class="dim-subtitle">${d.subtitle}</div>
+        <ul class="dim-criteria">${d.criteria.map(c=>`<li>${c}</li>`).join('')}</ul>
+        <div style="margin-top:10px;display:flex;gap:6px">
+          ${[1,2,3,4,5].map(n=>`<div style="flex:1;height:4px;border-radius:2px;background:${n<=3?d.color:d.color+'40'}"></div>`).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--slate-400);margin-top:2px"><span>Poor</span><span>World Class</span></div>
+      </div>
+    `).join('');
+  }
+}
+
+function renderQCDSMERadar() {
+  const svg = document.getElementById('qcdsme-radar');
+  const legend = document.getElementById('qcdsme-legend');
+  const dims = state.qcdsme.dims;
+  const cx = 200, cy = 170, r = 120;
+  const n = dims.length;
+  let html = '';
+  for (let l=1;l<=5;l++) {
+    const fr = r*l/5;
+    const pts = dims.map((_,i)=>{ const a=(2*Math.PI*i/n)-Math.PI/2; return `${cx+fr*Math.cos(a)},${cy+fr*Math.sin(a)}`; }).join(' ');
+    html += `<polygon points="${pts}" fill="none" stroke="#DBEAFE" stroke-width="1"/>`;
+    html += `<text x="${cx+8}" y="${cy-fr}" font-size="9" fill="#94A3B8">${l}</text>`;
+  }
+  dims.forEach((d,i)=>{
+    const a=(2*Math.PI*i/n)-Math.PI/2;
+    html += `<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(a)}" y2="${cy+r*Math.sin(a)}" stroke="#BFDBFE" stroke-width="1"/>`;
+    const lx=cx+(r+24)*Math.cos(a), ly=cy+(r+24)*Math.sin(a);
+    const anchor=Math.cos(a)>0.3?'start':Math.cos(a)<-0.3?'end':'middle';
+    html += `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle" font-size="11" fill="${d.color}" font-weight="700">${d.id}</text>`;
+    html += `<text x="${lx}" y="${ly+12}" text-anchor="${anchor}" dominant-baseline="middle" font-size="9" fill="#94A3B8">${d.label}</text>`;
+  });
+  state.vendors.forEach((v,vi)=>{
+    const col = COLORS[vi%COLORS.length];
+    const pts = dims.map((d,i)=>{
+      const sc = (state.qcdsme.scores[v.id]||{})[d.id]||0;
+      const fr = r*sc/5;
+      const a=(2*Math.PI*i/n)-Math.PI/2;
+      return `${cx+fr*Math.cos(a)},${cy+fr*Math.sin(a)}`;
+    }).join(' ');
+    html += `<polygon points="${pts}" fill="${col}" fill-opacity="0.1" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`;
+  });
+  svg.innerHTML = html;
+  if (legend) legend.innerHTML = state.vendors.map((v,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${COLORS[i%COLORS.length]}"></div>${v.name.split(' ')[0]}</div>`).join('');
+}
+
+function setQDimWeight(dimId, val) {
+  const dim = state.qcdsme.dims.find(d=>d.id===dimId);
+  if (dim) { dim.weight = parseInt(val)||0; }
+  const el = document.getElementById('qw-'+dimId);
+  if (el) el.textContent = val+'%';
+  const total = state.qcdsme.dims.reduce((a,d)=>a+d.weight,0);
+  const wtEl = document.getElementById('qcdsme-weight-total');
+  if (wtEl) {
+    wtEl.textContent = 'Total: '+total+'%';
+    wtEl.style.background = total===100?'var(--green-100)':'var(--red-100)';
+    wtEl.style.color = total===100?'var(--green-600)':'var(--red-600)';
+  }
+  renderQCDSMERadar();
+}
+
+function setQScore(vendorId, dimId, val) {
+  if (!state.qcdsme.scores[vendorId]) state.qcdsme.scores[vendorId]={};
+  state.qcdsme.scores[vendorId][dimId] = Math.max(1,Math.min(5,parseInt(val)||1));
+  renderQCDSME();
+}
+
+// ============================================================
+// APPROVAL & GOVERNANCE FUNCTIONS
+// ============================================================
+const STAGE_META = {
+  pre_qual:   { label:'Pre-Qualification', icon:'📋', order:1 },
+  tech_eval:  { label:'Technical Evaluation', icon:'🔬', order:2 },
+  commercial: { label:'Commercial Review', icon:'💰', order:3 },
+  legal:      { label:'Legal & Compliance', icon:'⚖️', order:4 },
+  award:      { label:'Award Recommendation', icon:'🏆', order:5 },
+  contract:   { label:'Contract Execution', icon:'✍️', order:6 },
+};
+
+function getApprovalStats() {
+  const aprs = state.approvals;
+  return {
+    pending: aprs.filter(a=>a.status==='pending').length,
+    approved: aprs.filter(a=>a.status==='approved').length,
+    rejected: aprs.filter(a=>a.status==='rejected').length,
+    conditional: aprs.filter(a=>a.status==='conditional').length,
+  };
+}
+
+function renderApproval() {
+  const stats = getApprovalStats();
+  document.getElementById('gov-pending').textContent = stats.pending;
+  document.getElementById('gov-approved').textContent = stats.approved;
+  document.getElementById('gov-rejected').textContent = stats.rejected;
+  document.getElementById('gov-conditional').textContent = stats.conditional;
+
+  renderStagegate();
+  renderPipelineTable();
+  renderPreAwardChecklist();
+  renderCOIRegister();
+  renderAuditTrail();
+  renderKPIPanel();
+  renderDecisionPanel();
+}
+
+function renderStagegate() {
+  const stages = Object.entries(STAGE_META).sort((a,b)=>a[1].order-b[1].order);
+  const el = document.getElementById('stage-gate-visual');
+  if (!el) return;
+  el.innerHTML = stages.map(([key, meta], i) => {
+    const stageAprs = state.approvals.filter(a=>a.stage===key);
+    const hasApproved = stageAprs.some(a=>a.status==='approved');
+    const hasPending = stageAprs.some(a=>a.status==='pending');
+    const hasRejected = stageAprs.some(a=>a.status==='rejected');
+    const cls = hasRejected?'blocked':hasApproved?'done':hasPending?'active':'';
+    const arrow = i < stages.length-1 ? '<div class="stage-arrow"></div>' : '';
+    return `<div class="stage-gate">
+      <div class="stage-gate-box ${cls}">
+        <div class="stage-gate-icon">${meta.icon}</div>
+        <div style="font-size:10px;font-weight:700;line-height:1.3">${meta.label}</div>
+        <div class="stage-gate-count">${stageAprs.length}</div>
+      </div>
+    </div>${arrow}`;
+  }).join('');
+}
+
+function renderPipelineTable() {
+  const el = document.getElementById('approval-pipeline-table');
+  if (!el) return;
+  const statusMap = { pending:'apl-pending', approved:'apl-approved', rejected:'apl-rejected', conditional:'apl-conditional', review:'apl-review' };
+  const statusIcon = { pending:'⏳', approved:'✅', rejected:'❌', conditional:'⚠️', review:'🔍' };
+  const priMap = { normal:'pri-normal', urgent:'pri-urgent', critical:'pri-critical' };
+  const sorted = [...state.approvals].sort((a,b)=>{
+    const order = {pending:0,conditional:1,review:2,approved:3,rejected:4};
+    return (order[a.status]||5)-(order[b.status]||5);
+  });
+  let html = `<thead><tr>
+    <th>Ref.</th><th>Vendor</th><th>Stage</th><th>Priority</th>
+    <th>Value (USD)</th><th>Status</th><th>Votes</th><th>Deadline</th><th>Actions</th>
+  </tr></thead><tbody>`;
+  sorted.forEach(apr => {
+    const vendor = state.vendors.find(v=>v.id===apr.vendorId);
+    const stMeta = STAGE_META[apr.stage]||{label:apr.stage,icon:'📄'};
+    const totalVotes = apr.votes.approve.length+apr.votes.reject.length+apr.votes.conditional.length;
+    html += `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--blue-700)">${apr.id}</td>
+      <td style="font-weight:500">${vendor?.name||'Unknown'}</td>
+      <td><span style="font-size:12px">${stMeta.icon}</span> ${stMeta.label}</td>
+      <td><span class="priority-chip ${priMap[apr.priority]||'pri-normal'}">${apr.priority}</span></td>
+      <td style="font-family:'DM Mono',monospace">$${(apr.value||0).toLocaleString()}</td>
+      <td><span class="apl-status ${statusMap[apr.status]||'apl-pending'}">${statusIcon[apr.status]||''} ${apr.status.charAt(0).toUpperCase()+apr.status.slice(1)}</span></td>
+      <td style="font-size:12px;color:var(--slate-500)">
+        <span style="color:var(--green-600)">✓${apr.votes.approve.length}</span>
+        <span style="color:var(--red-600);margin:0 4px">✗${apr.votes.reject.length}</span>
+        <span style="color:#8B5CF6">◐${apr.votes.conditional.length}</span>
+      </td>
+      <td style="font-size:12px;color:${apr.deadline&&new Date(apr.deadline)<new Date()?'var(--red-600)':'var(--slate-500)'}">${apr.deadline||'—'}</td>
+      <td>
+        ${apr.status==='pending'?`
+          <button class="btn btn-outline" style="font-size:11px;padding:4px 10px;margin-right:4px" onclick="voteApproval('${apr.id}','approve')">Approve</button>
+          <button class="btn" style="font-size:11px;padding:4px 10px;border:1px solid var(--red-300);color:var(--red-600);background:white" onclick="voteApproval('${apr.id}','reject')">Reject</button>
+        `:'<span style="font-size:11px;color:var(--slate-400)">Resolved</span>'}
+      </td>
+    </tr>`;
+  });
+  html += '</tbody>';
+  el.innerHTML = html;
+}
+
+function renderPreAwardChecklist() {
+  const items = [
+    { cat:'Legal', text:'Business registration & license verified and valid' },
+    { cat:'Legal', text:'Tax compliance certificate (SKBP/SKF) obtained' },
+    { cat:'Legal', text:'No active debarment or blacklist status confirmed' },
+    { cat:'Legal', text:'Conflict of interest declarations signed by all evaluators' },
+    { cat:'Financial', text:'Audited financial statements reviewed (min. 1 year)' },
+    { cat:'Financial', text:'Bank reference or financial guarantee obtained' },
+    { cat:'Financial', text:'Performance bond / bid security received (if required)' },
+    { cat:'Technical', text:'Technical evaluation completed and documented' },
+    { cat:'Technical', text:'Site visit / due diligence completed (for strategic vendors)' },
+    { cat:'Technical', text:'Product/service samples or POC validated' },
+    { cat:'Compliance', text:'TKDN certificate verified (if local content required)' },
+    { cat:'Compliance', text:'HSE plan reviewed and accepted' },
+    { cat:'Compliance', text:'Data privacy / GDPR compliance confirmed' },
+    { cat:'Process', text:'Tender evaluation report signed by all committee members' },
+    { cat:'Process', text:'Approval obtained per Delegation of Authority matrix' },
+    { cat:'Process', text:'Award notification letter prepared and reviewed' },
+  ];
+  const el = document.getElementById('pre-award-checklist');
+  if (!el) return;
+  const catColors = { Legal:'#2563EB', Financial:'#16A34A', Technical:'#D97706', Compliance:'#DC2626', Process:'#7C3AED' };
+  el.innerHTML = items.map((item,i) => `
+    <div class="pac-item" onclick="togglePAC(this)">
+      <div class="pac-check" id="pac-${i}">✓</div>
+      <div>
+        <div class="pac-text">${item.text}</div>
+        <div class="pac-category" style="color:${catColors[item.cat]||'var(--slate-400)'}">${item.cat}</div>
+      </div>
+    </div>
+  `).join('');
+  // Pre-check some items
+  [0,1,2,4,9,13].forEach(i=>{
+    const el2 = el.querySelector(`#pac-${i}`);
+    if(el2) { el2.classList.add('checked'); el2.closest('.pac-item').style.opacity='0.7'; }
+  });
+}
+
+function togglePAC(row) {
+  const check = row.querySelector('.pac-check');
+  check.classList.toggle('checked');
+  row.style.opacity = check.classList.contains('checked') ? '0.7' : '1';
+}
+
+function renderCOIRegister() {
+  const el = document.getElementById('coi-register');
+  if (!el) return;
+  const coiData = state.vendors.map(v => ({
+    name: v.name,
+    evaluator: v.contact,
+    status: v.conflictOfInterest || 'No conflict declared',
+  }));
+  el.innerHTML = `
+    <div style="font-size:12px;color:var(--slate-500);margin-bottom:10px">All evaluators must declare conflicts before participating in evaluation</div>
+    ${coiData.map(c => `
+      <div class="coi-row">
+        <div class="coi-name">${c.name}</div>
+        <div class="coi-detail">Contact: ${c.evaluator||'—'}</div>
+        <div style="margin-top:4px">
+          <span style="font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;
+            background:${c.status.includes('No conflict')?'var(--green-100)':c.status.includes('Potential')?'var(--amber-100)':'var(--red-100)'};
+            color:${c.status.includes('No conflict')?'var(--green-600)':c.status.includes('Potential')?'var(--amber-600)':'var(--red-600)'}">
+            ${c.status.includes('No conflict')?'✓':'⚠'} ${c.status}
+          </span>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function renderAuditTrail() {
+  const el = document.getElementById('audit-trail');
+  if (!el) return;
+  const typeMap = { approved:'audit-approved-dot', submitted:'audit-submitted-dot', rejected:'audit-rejected-dot', system:'audit-system-dot', conditional:'audit-conditional-dot' };
+  el.innerHTML = state.auditLog.map(e => `
+    <div class="audit-entry">
+      <div class="audit-dot ${typeMap[e.type]||'audit-system-dot'}"></div>
+      <div>
+        <div class="audit-action">${e.action}</div>
+        <div class="audit-meta">${e.actor} · ${e.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderKPIPanel() {
+  const el = document.getElementById('vendor-kpi-panel');
+  if (!el) return;
+  const kpis = [
+    { label:'On-Time Delivery (avg)', value:87, color:'var(--blue-500)', target:90 },
+    { label:'Quality Acceptance Rate', value:94, color:'var(--green-500)', target:95 },
+    { label:'Invoice Accuracy', value:98, color:'var(--green-600)', target:98 },
+    { label:'Response Time SLA', value:78, color:'var(--amber-500)', target:85 },
+    { label:'Complaint Resolution Rate', value:91, color:'var(--blue-600)', target:90 },
+  ];
+  el.innerHTML = kpis.map(k => `
+    <div class="kpi-row">
+      <div class="kpi-label">
+        <span>${k.label}</span>
+        <span style="font-family:'DM Mono',monospace;font-weight:700;color:${k.value>=k.target?'var(--green-600)':'var(--amber-600)'}">${k.value}%</span>
+      </div>
+      <div class="kpi-bar">
+        <div class="kpi-fill" style="width:${k.value}%;background:${k.color}"></div>
+      </div>
+      <div style="font-size:10px;color:var(--slate-400);margin-top:2px">Target: ${k.target}%</div>
+    </div>
+  `).join('');
+}
+
+function renderDecisionPanel() {
+  const el = document.getElementById('approval-decision-panel');
+  if (!el) return;
+  const pendingAprs = state.approvals.filter(a=>a.status==='pending');
+  if (!pendingAprs.length) {
+    el.innerHTML = '<div style="text-align:center;padding:28px;color:var(--slate-400);font-size:13px">No pending approvals requiring a vote</div>';
+    return;
+  }
+  const evaluators = ['Ahmad Fauzi (Proc. Mgr)','Siti Rahayu (Finance)','Budi Santoso (Legal)','Rina Wijaya (Tech Lead)'];
+  el.innerHTML = pendingAprs.map(apr => {
+    const vendor = state.vendors.find(v=>v.id===apr.vendorId);
+    const stMeta = STAGE_META[apr.stage]||{label:apr.stage,icon:'📄'};
+    const total = apr.votes.approve.length+apr.votes.reject.length+apr.votes.conditional.length+apr.votes.abstain.length;
+    return `<div class="decision-vendor-row">
+      <div class="decision-vendor-header">
+        <div>
+          <div style="font-weight:700;font-size:14px">${vendor?.name||'Unknown'} <span style="font-size:12px;color:var(--blue-600)">${stMeta.icon} ${stMeta.label}</span></div>
+          <div style="font-size:12px;color:var(--slate-500);margin-top:2px">${apr.id} · $${(apr.value||0).toLocaleString()} · Due: ${apr.deadline||'—'}</div>
+          <div style="font-size:12px;color:var(--slate-600);margin-top:6px;font-style:italic">"${apr.notes}"</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:11px;color:var(--slate-400)">Votes cast: ${total}/${evaluators.length}</div>
+          <div style="margin-top:4px;font-size:13px">
+            <span style="color:var(--green-600);font-weight:700">✓${apr.votes.approve.length}</span>
+            <span style="color:var(--red-600);font-weight:700;margin:0 6px">✗${apr.votes.reject.length}</span>
+            <span style="color:#8B5CF6;font-weight:700">◐${apr.votes.conditional.length}</span>
+          </div>
+        </div>
+      </div>
+      <div class="decision-votes">
+        ${evaluators.map((ev,ei) => {
+          const isApproved = apr.votes.approve.some(v=>v.includes(ev.split(' ')[0]));
+          const isRejected = apr.votes.reject.some(v=>v.includes(ev.split(' ')[0]));
+          const isConditional = apr.votes.conditional.some(v=>v.includes(ev.split(' ')[0]));
+          return `<div style="display:flex;flex-direction:column;gap:5px;min-width:130px">
+            <div style="font-size:11px;font-weight:600;color:var(--slate-600)">${ev}</div>
+            <div style="display:flex;gap:5px">
+              <button class="vote-btn vote-approve ${isApproved?'active':''}" onclick="castVote('${apr.id}',${ei},'approve')" title="Approve">✓</button>
+              <button class="vote-btn vote-reject ${isRejected?'active':''}" onclick="castVote('${apr.id}',${ei},'reject')" title="Reject">✗</button>
+              <button class="vote-btn vote-conditional ${isConditional?'active':''}" onclick="castVote('${apr.id}',${ei},'conditional')" title="Conditional">◐</button>
+              <button class="vote-btn vote-abstain" onclick="castVote('${apr.id}',${ei},'abstain')" title="Abstain">—</button>
+            </div>
+          </div>`;
+        }).join('')}
+        <div class="vote-tally" style="margin-left:auto;font-size:12px;color:var(--slate-500)">
+          Quorum: ${apr.votes.approve.length+apr.votes.reject.length+apr.votes.conditional.length}/${evaluators.length}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function castVote(aprId, evIdx, voteType) {
+  const apr = state.approvals.find(a=>a.id===aprId);
+  if (!apr) return;
+  const evaluators = ['Ahmad F.','Siti R.','Budi S.','Rina W.'];
+  const ev = evaluators[evIdx];
+  // Remove from all vote arrays
+  ['approve','reject','conditional','abstain'].forEach(k=>{
+    if (!apr.votes[k]) apr.votes[k]=[];
+    apr.votes[k] = apr.votes[k].filter(v=>v!==ev);
+  });
+  if (!apr.votes[voteType]) apr.votes[voteType]=[];
+  apr.votes[voteType].push(ev);
+  // Auto-resolve if majority
+  const totalEv = evaluators.length;
+  if (apr.votes.approve.length > totalEv/2) {
+    apr.status = 'approved'; apr.resolvedAt = new Date().toLocaleDateString('en-GB');
+    addAuditEntry('approved', `${aprId} approved by majority vote`, 'Tender Board');
+    showToast(`✅ ${aprId} approved!`);
+  } else if (apr.votes.reject.length > totalEv/2) {
+    apr.status = 'rejected'; apr.resolvedAt = new Date().toLocaleDateString('en-GB');
+    addAuditEntry('rejected', `${aprId} rejected by majority vote`, 'Tender Board');
+    showToast(`❌ ${aprId} rejected.`);
+  }
+  renderApproval();
+}
+
+function addAuditEntry(type, action, actor) {
+  state.auditLog.unshift({ type, action, actor, time: new Date().toLocaleString('en-GB') });
+}
+
+function openApprovalModal() {
+  const sel = document.getElementById('apr-vendor');
+  if (sel) sel.innerHTML = state.vendors.map(v=>`<option value="${v.id}">${v.name}</option>`).join('');
+  document.getElementById('approval-modal').classList.add('open');
+}
+function closeApprovalModal() {
+  document.getElementById('approval-modal').classList.remove('open');
+}
+function submitApprovalRequest() {
+  const vendorId = parseInt(document.getElementById('apr-vendor').value);
+  const stage = document.getElementById('apr-stage').value;
+  if (!stage) { showToast('Please select an approval stage'); return; }
+  const value = parseFloat(document.getElementById('apr-value').value)||0;
+  const deadline = document.getElementById('apr-deadline').value;
+  const notes = document.getElementById('apr-notes').value.trim();
+  const requester = document.getElementById('apr-requester').value.trim()||'Procurement Officer';
+  const priority = document.getElementById('apr-priority').value||'normal';
+  const id = 'APR-00'+state.nextApprovalId++;
+  state.approvals.unshift({ id, vendorId, stage, status:'pending', priority, value, deadline, requester, notes, submittedAt:new Date().toLocaleDateString('en-GB'), resolvedAt:null, votes:{approve:[],reject:[],conditional:[],abstain:[]} });
+  addAuditEntry('submitted', `${id} submitted for ${STAGE_META[stage]?.label||stage}`, requester);
+  closeApprovalModal();
+  renderApproval();
+  showToast(`✓ ${id} submitted for approval`);
+}
+
+function voteApproval(aprId, action) {
+  const apr = state.approvals.find(a=>a.id===aprId);
+  if (!apr) return;
+  const actor = 'Current User';
+  if (action==='approve') {
+    apr.votes.approve.push(actor);
+    if (apr.votes.approve.length>=2) { apr.status='approved'; apr.resolvedAt=new Date().toLocaleDateString('en-GB'); addAuditEntry('approved',`${aprId} approved`,actor); showToast('✅ Approval granted'); }
+    else { addAuditEntry('submitted',`Vote to approve ${aprId} recorded`,actor); showToast('Vote recorded — awaiting quorum'); }
+  } else {
+    apr.votes.reject.push(actor);
+    apr.status='rejected'; apr.resolvedAt=new Date().toLocaleDateString('en-GB');
+    addAuditEntry('rejected',`${aprId} rejected`,actor); showToast('❌ Vendor rejected');
+  }
+  renderApproval();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderOverview();
+</script>
+</body>
+</html>
